@@ -4,6 +4,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Support Dashboard</title>
     <style>
+
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 241, 241, 0.0);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #6A7482;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #58616c;
+        }
+
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
@@ -20,7 +39,8 @@
 
         main {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr 1.5fr 1.5fr; /* three columns of equal width */
+            grid-template-rows: auto auto; /* two rows */
             gap: 20px;
             padding: 20px;
         }
@@ -30,24 +50,34 @@
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            height: 60vh;
         }
 
-        .graph {
-            margin-top: 20%;
+        .full-height {
+            grid-row: 1 / -1;
         }
 
-        canvas {
-            width: 20%;
-            height: 10px;
+        main > :nth-child(4) {
+            grid-column: 2 / span 2;
+            grid-row: 2;
+        }
+
+        .card:not(.full-height) {
+            height: 41vh;
+        }
+        .full-height {
+            height: 90vh;
+            width: 45vh;
         }
 
         #open-tickets-list {
-            width: 100%;
+            width: auto;
+            height: 300px;
+            overflow: auto;
             list-style-type: none;
             padding: 0;
-            margin-top: 10%;
         }
+
+
 
         #open-tickets-list li {
             background-color: #ECFFFE;
@@ -77,15 +107,27 @@
         #priority-chart {
             margin: auto;
             display: flex;
-            height: 400px;
-            width: 400px;
+            height: 300px;
+            width: 300px;
         }
+
+        #week-chart {
+            margin: auto;
+            display: flex;
+            height: 200px;
+            width: 650px;
+        }
+
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <main>
 
+    <section class="card full-height">
+        <h2>ARDeco Administration tool</h2>
+    </section>
     <section class="card">
         <h2>All tickets status</h2>
         <canvas id="priority-chart"></canvas>
@@ -131,12 +173,20 @@
                         }]
                     },
                     options: {
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 20,
+                                    font: {
+                                        size: 20
+                                    }
+                                }
+                            }
+                        },
                         responsive: false,
-                        maintainAspectRatio: true,
-                        cutout: '70%',
-                        legend: {
-                            position: 'right',
-                        }
+                        maintainAspectRatio: false,
+                        cutout: '70%'
                     }
                 }
             );
@@ -182,8 +232,8 @@
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
+                    responsive: false,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: false

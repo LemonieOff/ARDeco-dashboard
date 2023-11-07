@@ -77,8 +77,6 @@
             padding: 0;
         }
 
-
-
         #open-tickets-list li {
             background-color: #ECFFFE;
             padding: 10px 15px;
@@ -118,7 +116,28 @@
             width: 650px;
         }
 
+        #categories {
+            padding: 0;
+            list-style-type: none;
+            margin: 20px;
+        }
 
+        #categories li {
+            margin-bottom: 30px;
+            padding: 15px 30px;
+            color: #6A7482;
+            font-weight: bold;
+        }
+
+        #categories li.selected {
+            background: #ECFFFE;
+            color: #6A7482;
+        }
+
+        a {
+            text-decoration: none;
+            color: #6A7482;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -127,6 +146,12 @@
 
     <section class="card full-height">
         <h2>ARDeco Administration tool</h2>
+        <ul id="categories">
+            <li class="selected">Tickets</li>
+            <li><a href="/users">User</a></li>
+            <li>Catalog</li>
+            <li>Statistics</li>
+        </ul>
     </section>
     <section class="card">
         <h2>All tickets status</h2>

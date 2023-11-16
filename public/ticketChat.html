@@ -69,7 +69,7 @@
       grid-row: 1 / -1;
     }
     .full-height2 {
-      height: 90vh;
+      height: 78vh;
       width: 70vw;
     }
     #open-tickets-list li:last-child {
@@ -100,10 +100,12 @@
     }
 
     .message {
+      max-width: 66%; /* Max width to 2/3 of parent */
+      word-wrap: break-word; /* Ensure text wraps to next line */
       padding: 10px;
       margin: 10px;
       border-radius: 10px;
-      border: 1px solid #526ce3;
+      background: #e1e9f5;
       color: #6A7482;
       width: 50%;
     }
@@ -116,6 +118,24 @@
       float: right;
       background: #526ce3;
       color: white;
+    }
+
+    #chat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .text-height {
+      height: 6vh;
+    }
+
+    #messages-list {
+      overflow: auto;
+      height: 80%;
+    }
+
+    ul {
+      list-style-type: none;
     }
 
   </style>
@@ -132,13 +152,31 @@
       <li>Statistics</li>
     </ul>
   </section>
-  <section class="card full-height2">
-    <h2>Chat</h2>
-  </section>
+  <div id="chat">
+    <section class="card full-height2">
+      <h2>Chat</h2>
+      <button id="closeButton">Close ticket</button>
+      <ul id="messages-list"></ul>
+    </section>
+    <section class="card text-height" style="margin-top: 2vh">
+      <label for="answer">answer:</label>
+      <input type="text" id="answer" name="answer">
+      <button id="sendButton">Respond</button>
+    </section>
+  </div>
+
 
 </main>
 </body>
 <script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('sendButton').addEventListener('click', respondToTicket);
+  });
+
+  document.addEventListener('DOMContentLoaded', (event) => {
+    document.getElementById('closeButton').addEventListener('click', closeTicket);
+  });
+
   function getTicket() { //get the ticket (the last / of the route is the ticket id)
     fetch(`http://localhost:8000/ticket/${window.location.pathname.split('/').pop()}`, {
       method: 'GET',
@@ -155,16 +193,15 @@
       if (data.status === 'OK') {
         console.log(data.data);
         let messages = JSON.parse(data.data.messages);
-        //create all messages left if the user is the sender, right if the user is "support"
         for (let i = 0; i < messages.length; i++) {
           console.log(messages[i]);
-          let message = document.createElement('div');
+          let message = document.createElement('li');
+          if(messages[i].sender==="Support") {
+            message.classList.add('right')
+          }
           message.classList.add('message');
-          message.classList.add(messages[i].sender === 'support' ? 'right' : 'left');
-          message.innerHTML += messages[i].sender === 'support' ? 'You' : messages[i].sender;
-          message.innerHTML += '<br>';
-          message.innerHTML = messages[i].content;
-          document.querySelector('.full-height2').appendChild(message);
+          message.innerHTML = messages[i].sender + ":"+ '<br>' + messages[i].content;
+          document.querySelector('#messages-list').appendChild(message);
         }
       }
     }).catch(error => {
@@ -172,5 +209,54 @@
     });
   }
     getTicket();
+
+  function respondToTicket() {
+    const messageContent = document.getElementById('answer').value;
+    const requestBody = {
+      message: messageContent
+    };
+
+
+    fetch(`http://localhost:8000/ticket/write/${window.location.pathname.split('/').pop()}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+      },
+      body: JSON.stringify(requestBody)
+    }).then(response => response.json())
+            .then(data => {
+              console.log('Message sent:', data);
+
+              setTimeout(() => {
+                refreshMessages();
+              }, 500);
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+  }
+
+  function refreshMessages() {
+    const messagesContainer = document.querySelector('.full-height2');
+    messagesContainer.innerHTML = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    getTicket();
+  }
+
+  function closeTicket() {
+    fetch(`http://localhost:8000/ticket/close/${window.location.pathname.split('/').pop()}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+      }
+    }).then(response => response.json()).then(function(){window.location.href = '/dashboard'}).catch(error => {
+      console.error('Error:', error);
+    });
+  }
 </script>
 </html>

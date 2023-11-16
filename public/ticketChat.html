@@ -39,8 +39,8 @@
 
     main {
       display: grid;
-      grid-template-columns: 1fr 1.5fr 1.5fr; /* three columns of equal width */
-      grid-template-rows: auto auto; /* two rows */
+      grid-template-columns: 1fr 1.5fr 1.5fr;
+      grid-template-rows: auto auto;
       gap: 20px;
       padding: 20px;
     }
@@ -100,8 +100,8 @@
     }
 
     .message {
-      max-width: 66%; /* Max width to 2/3 of parent */
-      word-wrap: break-word; /* Ensure text wraps to next line */
+      max-width: 66%;
+      word-wrap: break-word;
       padding: 10px;
       margin: 10px;
       border-radius: 10px;
@@ -138,6 +138,66 @@
       list-style-type: none;
     }
 
+    .text-input-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-top: 2px solid #e1e9f5;
+    }
+
+    #answer {
+      flex-grow: 1;
+      padding: 10px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    #answer:focus {
+      border-color: #526ce3;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    #sendButton {
+      background-color: #526ce3;
+      color: white;
+      margin-right: 2%;
+    }
+
+    #sendButton:hover {
+      background-color: #4055b2;
+    }
+
+    #closeButton {
+      background-color: #1BCFC4;
+      color: white;
+      margin-right: 1%;
+    }
+
+    #deleteButton {
+      background: #9E58FF;
+      color: white;
+    }
+
+    #closeButton:hover {
+      background-color: #15a29a;
+    }
+
+    #deleteButton:hover {
+      background: #4d2c7c;
+    }
+
+
   </style>
 </head>
 <body>
@@ -155,29 +215,31 @@
   <div id="chat">
     <section class="card full-height2">
       <h2>Chat</h2>
-      <button id="closeButton">Close ticket</button>
-      <ul id="messages-list"></ul>
+      <div id="messages-list"></div>
     </section>
-    <section class="card text-height" style="margin-top: 2vh">
-      <label for="answer">answer:</label>
+    <section class="card text-height text-input-container" style="margin-top: 2vh">
+      <label for="answer"></label>
       <input type="text" id="answer" name="answer">
       <button id="sendButton">Respond</button>
+      <button id="closeButton">Close ticket</button>
+      <button id="deleteButton">Delete ticket</button>
     </section>
+
   </div>
 
 
 </main>
 </body>
 <script>
-  document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sendButton').addEventListener('click', respondToTicket);
   });
 
-  document.addEventListener('DOMContentLoaded', (event) => {
+  document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('closeButton').addEventListener('click', closeTicket);
   });
 
-  function getTicket() { //get the ticket (the last / of the route is the ticket id)
+  function getTicket() {
     fetch(`http://localhost:8000/ticket/${window.location.pathname.split('/').pop()}`, {
       method: 'GET',
       credentials: 'include',
@@ -195,7 +257,7 @@
         let messages = JSON.parse(data.data.messages);
         for (let i = 0; i < messages.length; i++) {
           console.log(messages[i]);
-          let message = document.createElement('li');
+          let message = document.createElement('div');
           if(messages[i].sender==="Support") {
             message.classList.add('right')
           }
@@ -239,15 +301,26 @@
   }
 
   function refreshMessages() {
-    const messagesContainer = document.querySelector('.full-height2');
+    const messagesContainer = document.querySelector('#messages-list');
     messagesContainer.innerHTML = '';
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
     getTicket();
   }
 
   function closeTicket() {
     fetch(`http://localhost:8000/ticket/close/${window.location.pathname.split('/').pop()}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+      }
+    }).then(response => response.json()).then(function(){window.location.href = '/dashboard'}).catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  function deleteTicket() {
+    fetch(`http://localhost:8000/ticket/delete/${window.location.pathname.split('/').pop()}`, {
       method: 'PUT',
       credentials: 'include',
       headers: {

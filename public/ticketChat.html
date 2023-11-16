@@ -1,0 +1,176 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Support Dashboard</title>
+  <style>
+
+    ::-webkit-scrollbar {
+      width: 7px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(241, 241, 241, 0.0);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #6A7482;
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #58616c;
+    }
+
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #526ce3;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr 1.5fr; /* three columns of equal width */
+      grid-template-rows: auto auto; /* two rows */
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .full-height {
+      grid-row: 1 / -1;
+    }
+
+    main > :nth-child(4) {
+      grid-column: 2 / span 2;
+      grid-row: 2;
+    }
+
+    .full-height {
+      height: 90vh;
+      width: 45vh;
+    }
+    .full-height2 {
+      grid-row: 1 / -1;
+    }
+    .full-height2 {
+      height: 90vh;
+      width: 70vw;
+    }
+    #open-tickets-list li:last-child {
+      border-bottom: none;
+    }
+
+    #categories {
+      padding: 0;
+      list-style-type: none;
+      margin: 20px;
+    }
+
+    #categories li {
+      margin-bottom: 30px;
+      padding: 15px 30px;
+      color: #6A7482;
+      font-weight: bold;
+    }
+
+    #categories li.selected {
+      background: #ECFFFE;
+      color: #6A7482;
+    }
+
+    a {
+      text-decoration: none;
+      color: #6A7482;
+    }
+
+    .message {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      border: 1px solid #526ce3;
+      color: #6A7482;
+      width: 50%;
+    }
+
+    .left {
+      float: left;
+    }
+
+    .right {
+      float: right;
+      background: #526ce3;
+      color: white;
+    }
+
+  </style>
+</head>
+<body>
+<main>
+
+  <section class="card full-height">
+    <h2>ARDeco Administration tool</h2>
+    <ul id="categories">
+      <li class="selected">Tickets</li>
+      <li><a href="/users">User</a></li>
+      <li>Catalog</li>
+      <li>Statistics</li>
+    </ul>
+  </section>
+  <section class="card full-height2">
+    <h2>Chat</h2>
+  </section>
+
+</main>
+</body>
+<script>
+  function getTicket() { //get the ticket (the last / of the route is the ticket id)
+    fetch(`http://localhost:8000/ticket/${window.location.pathname.split('/').pop()}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+      }
+    })
+      .then(function(response) {
+        return response.json();
+      }).then(function(data) {
+      console.log(data);
+      if (data.status === 'OK') {
+        console.log(data.data);
+        let messages = JSON.parse(data.data.messages);
+        //create all messages left if the user is the sender, right if the user is "support"
+        for (let i = 0; i < messages.length; i++) {
+          console.log(messages[i]);
+          let message = document.createElement('div');
+          message.classList.add('message');
+          message.classList.add(messages[i].sender === 'support' ? 'right' : 'left');
+          message.innerHTML += messages[i].sender === 'support' ? 'You' : messages[i].sender;
+          message.innerHTML += '<br>';
+          message.innerHTML = messages[i].content;
+          document.querySelector('.full-height2').appendChild(message);
+        }
+      }
+    }).catch(error => {
+      console.error(error);
+    });
+  }
+    getTicket();
+</script>
+</html>

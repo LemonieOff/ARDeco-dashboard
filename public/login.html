@@ -1,93 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <style>
-    .login-container {
-      width: 300px;
-      margin: 0 auto;
-      margin-top: 10%;
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
 
-    #login-form input {
-      width: 100%;
-      padding-top: 10px;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-  </style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .login-container {
+            width: 300px;
+            margin: 0 auto;
+            margin-top: 10%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #login-form input {
+            width: 100%;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            background: #1BCFC4;
+            color: white;
+        }
+
+        button {
+            display: block;
+            margin: 0 auto;
+        }
+
+        b {
+            color: red;
+        }
+
+        #errorDiv {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+    </style>
 </head>
 <body>
 <div class="login-container">
-  <h1>Connectez-vous</h1>
-  <form id="login-form">
-    <input type="text" placeholder="email" required>
-    <input type="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-  </form>
+    <h1>Connectez-vous</h1>
+    <form id="login-form">
+        <input type="text" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+        <div id="errorDiv"></div>
+    </form>
 </div>
 <script>
-  document.getElementById('login-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    fetch('http://localhost:8000/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: document.querySelector('#login-form input[type="text"]').value,
-        password: document.querySelector('#login-form input[type="password"]').value
-      })
-    })
-      .then(function(response) {
-        return response.json();
-      }).then(function(data) {
-        console.log(data);
-        if (data.status === 'OK') {
-          localStorage.setItem('jwt', data.data.jwt);
-          console.log('jwt', data.data);
-          document.cookie = `jwt=${data.data.jwt}`;
-          document.cookie = `uid=${data.data.userID}`;
-            getUserRole();
-        }
-      }).catch(error => {
-        console.error(error);
-      });
+
+
+    document.getElementById('login-form').addEventListener('submit', function (event) {
+        document.getElementById('errorDiv').innerHTML = "";
+        event.preventDefault();
+        fetch('http://localhost:8000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: document.querySelector('#login-form input[type="text"]').value,
+                password: document.querySelector('#login-form input[type="password"]').value
+            })
+        })
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                localStorage.setItem('jwt', data.data.jwt);
+                console.log('jwt', data.data);
+                document.cookie = `jwt=${data.data.jwt}`;
+                document.cookie = `uid=${data.data.userID}`;
+                getUserRole();
+            } else {
+                const loginForm = document.getElementById('errorDiv');
+                const error2 = document.createElement('b');
+                error2.innerText = "Admin login required";
+                loginForm.appendChild(error2);
+            }
+        }).catch(error => {
+            console.error("here2" + error);
+            const loginForm = document.getElementById('errorDiv');
+            const error2 = document.createElement('b');
+            error2.innerText = "Admin login required";
+            loginForm.appendChild(error2);
+        });
     });
 
-  function getUserRole() {
-    fetch(`http://localhost:8000/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-      .then(function(response) {
-        return response.json();
-      }).then(function(data) {
-        console.log(data);
-        if (data.status === 'OK') {
-          if (data.data.role === 'admin')
-            window.location.href = '/dashboard';
-          else
-            alert('Login as admin to access dashboard');
-        }
-      }).catch(error => {
-        console.error(error);
-      });
-  }
+    function getUserRole() {
+        fetch(`http://localhost:8000/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                if (data.data.role === 'admin')
+                    window.location.href = '/dashboard';
+                else {
+                    const loginForm = document.getElementById('errorDiv');
+                    const error = document.createElement('b');
+                    error.innerText = "Admin login required";
+                    loginForm.appendChild(error);
+                }
+            }
+        }).catch(error => {
+            console.error("here " + error);
+            const loginForm = document.getElementById('errorDiv');
+            const error2 = document.createElement('b');
+            error2.innerText = "Admin login required";
+            loginForm.appendChild(error2);
+        });
+    }
 
-    window.onload = function() {
+    window.onload = function () {
         if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
-   //(rc     getUserRole();
+            //(rc     getUserRole();
         }
     };
 

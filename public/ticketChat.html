@@ -1,345 +1,511 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customer Support Dashboard</title>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
 
-    ::-webkit-scrollbar {
-      width: 7px;
-    }
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
 
-    ::-webkit-scrollbar-track {
-      background: rgba(241, 241, 241, 0.0);
-    }
+        ::-webkit-scrollbar-track {
+            background: rgba(241, 241, 241, 0.0);
+        }
 
-    ::-webkit-scrollbar-thumb {
-      background: #6A7482;
-      border-radius: 5px;
-    }
+        ::-webkit-scrollbar-thumb {
+            background: #6A7482;
+            border-radius: 5px;
+        }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: #58616c;
-    }
-
-
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #526ce3;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr 1.5fr;
-      grid-template-rows: auto auto;
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .card {
-      background-color: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .full-height {
-      grid-row: 1 / -1;
-    }
-
-    main > :nth-child(4) {
-      grid-column: 2 / span 2;
-      grid-row: 2;
-    }
-
-    .full-height {
-      height: 90vh;
-      width: 45vh;
-    }
-    .full-height2 {
-      grid-row: 1 / -1;
-    }
-    .full-height2 {
-      height: 78vh;
-      width: 70vw;
-    }
-    #open-tickets-list li:last-child {
-      border-bottom: none;
-    }
-
-    #categories {
-      padding: 0;
-      list-style-type: none;
-      margin: 20px;
-    }
-
-    #categories li {
-      margin-bottom: 30px;
-      padding: 15px 30px;
-      color: #6A7482;
-      font-weight: bold;
-    }
-
-    #categories li.selected {
-      background: #ECFFFE;
-      color: #6A7482;
-    }
-
-    a {
-      text-decoration: none;
-      color: #6A7482;
-    }
-
-    .message {
-      max-width: 50%;
-      word-wrap: break-word;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 10px;
-      background: #e1e9f5;
-      color: #6A7482;
-      width: 50%;
-    }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #58616c;
+        }
 
 
-    #chat {
-      display: flex;
-      flex-direction: column;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
 
-    .text-height {
-      height: 6vh;
-    }
+        header {
+            background-color: #526ce3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
 
-    ul {
-      list-style-type: none;
-    }
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1.5fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            padding: 20px;
+        }
 
-    .text-input-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      border-top: 2px solid #e1e9f5;
-    }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    #answer {
-      flex-grow: 1;
-      padding: 10px;
-      margin-right: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      outline: none;
-    }
+        .full-height {
+            grid-row: 1 / -1;
+        }
 
-    #answer:focus {
-      border-color: #526ce3;
-    }
+        main > :nth-child(4) {
+            grid-column: 2 / span 2;
+            grid-row: 2;
+        }
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
+        .full-height {
+            height: 90vh;
+            width: 45vh;
+        }
 
-    #sendButton {
-      background-color: #526ce3;
-      color: white;
-      margin-right: 2%;
-    }
+        .full-height2 {
+            grid-row: 1 / -1;
+        }
 
-    #sendButton:hover {
-      background-color: #4055b2;
-    }
+        .full-height2 {
+            height: 79.5vh;
+            width: 70vw;
+        }
 
-    #closeButton {
-      background-color: #1BCFC4;
-      color: white;
-      margin-right: 1%;
-    }
+        #open-tickets-list li:last-child {
+            border-bottom: none;
+        }
 
-    #deleteButton {
-      background: #9E58FF;
-      color: white;
-    }
+        #categories {
+            padding: 0;
+            list-style-type: none;
+            margin: 20px;
+        }
 
-    #closeButton:hover {
-      background-color: #15a29a;
-    }
+        #categories li {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            color: #6A7482;
+            font-weight: bold;
+        }
 
-    #deleteButton:hover {
-      background: #4d2c7c;
-    }
+        #categories li.selected {
+            background: #ECFFFE;
+            color: #6A7482;
+            box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
+        }
 
+        a {
+            text-decoration: none;
+            color: #6A7482;
+        }
 
-    #messages-list {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      overflow-y: auto;
-      padding: 10px;
-    }
-
-    .right {
-      align-self: flex-end;
-      background: #1BCFC4;
-      color: white;
-    }
-
+        .message {
+            max-width: 50%;
+            word-wrap: break-word;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 10px;
+            background: #e1e9f5;
+            color: #6A7482;
+            width: 50%;
+        }
 
 
-  </style>
+        #chat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .text-height {
+            height: 6vh;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        .text-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        #answer {
+            flex-grow: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            outline: none;
+        }
+
+        .dark-mode #answer {
+            background: #1F2734;
+            color: white;
+        }
+
+        #answer:focus {
+            border-color: #1BCFC4;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        #sendButton {
+            background-color: #FE9496;
+            color: white;
+            margin-right: 2%;
+        }
+
+        #sendButton:hover {
+            background-color: #ea7e82;
+        }
+
+        #closeButton {
+            background-color: #1BCFC4;
+            color: white;
+            margin-right: 1%;
+        }
+
+        #deleteButton {
+            background: #9E58FF;
+            color: white;
+        }
+
+        #closeButton:hover {
+            background-color: #15a29a;
+        }
+
+        #deleteButton:hover {
+            background: #4d2c7c;
+        }
+
+
+        #messages-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            overflow: auto;
+            max-height: 80%;
+            padding: 10px;
+        }
+
+        .right {
+            align-self: flex-end;
+            background: #1BCFC4;
+            color: white;
+        }
+
+        .line {
+            width: 100%;
+            height: 1px;
+            background: #e1e9f5;
+            margin: 20px 0;
+        }
+
+        #theme-toggle {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dark-mode {
+            background: #18202D;
+            color: white;
+        }
+
+        .light-mode {
+            background-color: #f5f5f5;
+            color: black;
+        }
+
+        .dark-mode .card {
+            background-color: #1F2734;
+        }
+
+        .light-mode .card {
+            background-color: white;
+        }
+
+        .dark-mode #categories li.selected {
+            background-color: #18202D;
+            color: white;
+            box-shadow: none;
+        }
+
+        .dark-mode #open-tickets-list li {
+            background-color: #18202D;
+            box-shadow: none;
+        }
+
+        .dark-mode #open-tickets-list li a {
+            color: white;
+        }
+
+        .icon {
+            color: #1BCFC4;
+            background: #ffffff;
+        }
+
+        .iselected {
+            color: #ffffff;
+            background: #1BCFC4;
+        }
+
+        .dark-mode .icon {
+            color: #1F2734;
+            background: #1BCFC4;
+        }
+
+        #mode-toggle {
+            margin-top: 20%;
+            margin-left: 32%;
+            background-color: #9E58FF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        #mode-toggle:hover {
+            background-color: #4d2c7c;
+        }
+
+    </style>
 </head>
 <body>
 <main>
-
-  <section class="card full-height">
-    <h2>ARDeco Administration tool</h2>
-    <ul id="categories">
-      <li class="selected">Tickets</li>
-      <li><a href="/users">User</a></li>
-      <li>Catalog</li>
-      <li>Statistics</li>
-    </ul>
-  </section>
-  <div id="chat">
-    <section class="card full-height2">
-      <h2>Chat</h2>
-      <div id="messages-list"></div>
+    <section class="card full-height">
+        <h2>ARDeco Administration tool</h2>
+        <div class="line"></div>
+        <ul id="categories">
+            <li class="selected"><a href="/dashboard"><i class="fa-solid fa-ticket icon selected"
+                                    style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
+                Tickets
+            </a></li>
+            <li><a href="/users"><i class="fa-solid fa-user icon"
+                                    style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
+                User</a></li>
+            <li><i class="fa-solid fa-book icon"
+                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>Catalog
+            </li>
+            <li><i class="fa-solid fa-chart-simple icon"
+                   style="border-radius: 9px; padding: 10px;margin-right: 3px;"></i>Statistics
+            </li>
+        </ul>
+        <div class="line"></div>
+        <div style="background: #1BCFC4; height: 20%; width: 80%; border-radius: 15px; color: white; padding: 10%">
+            <h1>New categories may arrive in a future update of the admin dashboard</h1>
+        </div>
+        <button id="mode-toggle">Theme switch</button>
     </section>
-    <section class="card text-height text-input-container" style="margin-top: 2vh">
-      <label for="answer"></label>
-      <input type="text" id="answer" name="answer">
-      <button id="sendButton">Respond</button>
-      <button id="closeButton">Close ticket</button>
-      <button id="deleteButton">Delete ticket</button>
-    </section>
+    <div id="chat">
+        <section class="card full-height2">
+            <h2>Chat</h2>
+            <div id="messages-list"></div>
+        </section>
+        <section class="card text-height text-input-container" style="margin-top: 2vh">
+            <label for="answer"></label>
+            <input type="text" id="answer" name="answer">
+            <button id="sendButton">Respond</button>
+            <button id="closeButton">Close ticket</button>
+            <button id="deleteButton">Delete ticket</button>
+        </section>
 
-  </div>
+    </div>
 
 
 </main>
 </body>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('sendButton').addEventListener('click', respondToTicket);
-  });
 
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('closeButton').addEventListener('click', closeTicket);
-  });
+    if (localStorage.getItem('mode') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('deleteButton').addEventListener('click', deleteTicket);
-  });
-
-  function getTicket() {
-    fetch(`http://localhost:8000/ticket/${window.location.pathname.split('/').pop()}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
-      }
-    })
-            .then(function(response) {
-              return response.json();
-            }).then(function(data) {
-      console.log(data);
-      if (data.status === 'OK') {
-        console.log(data.data);
-        let messages = JSON.parse(data.data.messages);
-        for (let i = 0; i < messages.length; i++) {
-          console.log(messages[i]);
-          let message = document.createElement('div');
-          if(messages[i].sender==="Support") {
-            message.classList.add('right')
-          }
-          message.classList.add('message');
-          message.innerHTML = messages[i].sender + ":"+ '<br>' + messages[i].content;
-          document.querySelector('#messages-list').appendChild(message);
+    document.getElementById('mode-toggle').addEventListener('click', function () {
+        document.body.classList.toggle('dark-mode');
+        if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('mode', 'dark');
+        } else {
+            localStorage.setItem('mode', 'light');
         }
-      }
-    }).catch(error => {
-      console.error(error);
+        updateWeekChartGradient();
     });
-  }
-  getTicket();
 
-  function respondToTicket() {
-    const messageContent = document.getElementById('answer').value;
-    const requestBody = {
-      message: messageContent
-    };
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('sendButton').addEventListener('click', respondToTicket);
+    });
 
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('closeButton').addEventListener('click', closeTicket);
+    });
 
-    fetch(`http://localhost:8000/ticket/write/${window.location.pathname.split('/').pop()}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
-      },
-      body: JSON.stringify(requestBody)
-    }).then(response => response.json())
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('deleteButton').addEventListener('click', deleteTicket);
+    });
+
+    function getTicket(isBottom, currentScroll) {
+        getUserRole();
+        fetch(`http://localhost:8000/ticket/${window.location.pathname.split('/').pop()}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+            }
+        })
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                console.log(data.data);
+                let messages = JSON.parse(data.data.messages);
+                for (let i = 0; i < messages.length; i++) {
+                    console.log(messages[i]);
+                    let message = document.createElement('div');
+                    let dateText = document.createElement('div');
+
+                    if (messages[i].sender === "Support") {
+                        message.classList.add('right')
+                        dateText.classList.add('right')
+                    }
+                    message.classList.add('message');
+                    let string = messages[i].timestamp.replace(/,/g, '');
+                    let timestamp = parseInt(string, 10);
+                    let date = new Date(timestamp);
+                    dateText.innerHTML = date.toLocaleString();
+
+                    message.innerHTML = messages[i].sender + ":" + '<br>' + messages[i].content + '<br><br>' + date.toLocaleString();
+                    document.querySelector('#messages-list').appendChild(message);
+                    //  document.querySelector('#messages-list').appendChild(dateText);
+                }
+                if (isBottom)
+                    document.querySelector('#messages-list').scrollTop = document.querySelector('#messages-list').scrollHeight;
+                else
+                    document.querySelector('#messages-list').scrollTop = currentScroll;
+            }
+        }).catch(error => {
+            console.error(error);
+        });
+    }
+
+    getTicket(true, 0);
+
+    function respondToTicket() {
+        const messageContent = document.getElementById('answer').value;
+        const requestBody = {
+            message: messageContent
+        };
+        fetch(`http://localhost:8000/ticket/write/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+            },
+            body: JSON.stringify(requestBody)
+        }).then(response => response.json())
             .then(data => {
-              console.log('Message sent:', data);
-
-              setTimeout(() => {
-                refreshMessages();
-              }, 500);
+                console.log('Message sent:', data);
+                document.getElementById('answer').value = '';
+                setTimeout(() => {
+                    refreshMessages();
+                }, 500);
             })
             .catch(error => {
-              console.error('Error:', error);
+                console.error('Error:', error);
             });
-  }
+    }
 
-  function refreshMessages() {
-    const messagesContainer = document.querySelector('#messages-list');
-    messagesContainer.innerHTML = '';
-    getTicket();
-  }
+    function refreshMessages() {
+        let isBottom = document.querySelector('#messages-list').scrollHeight - document.querySelector('#messages-list').scrollTop === document.querySelector('#messages-list').clientHeight;
+        let currentScroll = document.querySelector('#messages-list').scrollTop;
+        const messagesContainer = document.querySelector('#messages-list');
+        messagesContainer.innerHTML = '';
+        getTicket(isBottom, currentScroll);
+    }
 
-  function closeTicket() {
-    fetch(`http://localhost:8000/ticket/close/${window.location.pathname.split('/').pop()}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
-      }
-    }).then(response => response.json()).then(function(){window.location.href = '/dashboard'}).catch(error => {
-      console.error('Error:', error);
-    });
-  }
+    function closeTicket() {
+        fetch(`http://localhost:8000/ticket/close/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+            }
+        }).then(response => response.json()).then(function () {
+            window.location.href = '/dashboard'
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
 
-  function deleteTicket() {
-    fetch(`http://localhost:8000/ticket/delete/${window.location.pathname.split('/').pop()}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
-      }
-    }).then(response => response.json()).then(function(){window.location.href = '/dashboard'}).catch(error => {
-      console.error('Error:', error);
-    });
-  }
+    function deleteTicket() {
+        fetch(`http://localhost:8000/ticket/delete/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+            }
+        }).then(response => response.json()).then(function () {
+            window.location.href = '/dashboard'
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
 
     setInterval(() => {
         refreshMessages();
     }, 10000);
+
+    function getUserRole() {
+        if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
+            fetch(`http://localhost:8000/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                console.log(data);
+                if (data.status === 'OK') {
+                    if (data.data.role === 'admin') {
+                        console.log('Admin');
+                    } else {
+                        window.location = "/";
+                        console.log('Login as admin to access dashboard');
+                    }
+                }
+            }).catch(error => {
+                window.location = "/";
+                console.error(error);
+            });
+        } else {
+            window.location = "/";
+        }
+    }
 </script>
 </html>

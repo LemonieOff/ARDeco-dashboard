@@ -399,8 +399,16 @@
             document.getElementById('0d').innerText += ' ' + today + " tickets were created";
 
             const gradient = weekChartCtx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, '#ffbdc0');   // Couleur de départ
-            gradient.addColorStop(1, '#FFFFFF');     // Couleur d'arrivée
+            let border;
+            if (localStorage.getItem('mode') === 'dark') {
+                gradient.addColorStop(0, 'rgba(158,88,255,0.88)');
+                gradient.addColorStop(1, '#4d2c7c');
+                border = '#9E58FF';
+            } else {
+                gradient.addColorStop(0, '#ffbdc0');
+                gradient.addColorStop(1, '#FFFFFF');
+                border = '#FE9496';
+            }
 
             weekChart = new Chart(weekChartCtx, {
                 type: 'line',
@@ -411,7 +419,7 @@
                         fill: true,
                         data: [sixDaysAgo, fiveDaysAgo, fourDaysAgo, threeDaysAgo, twoDaysAgo, yesterday, today],
                         backgroundColor: gradient,
-                        borderColor: '#FE9496',
+                        borderColor: border,
                         borderWidth: 1,
                         tension: 0.3,
                         pointRadius: 1,

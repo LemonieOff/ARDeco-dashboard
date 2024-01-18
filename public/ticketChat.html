@@ -305,10 +305,10 @@
                                     style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
                 User</a></li>
             <li><i class="fa-solid fa-book icon"
-                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>Catalog
+                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Catalog
             </li>
             <li><i class="fa-solid fa-chart-simple icon"
-                   style="border-radius: 9px; padding: 10px;margin-right: 3px;"></i>Statistics
+                   style="border-radius: 9px; padding: 10px;margin-right: 3px;"></i> Statistics
             </li>
         </ul>
         <div class="line"></div>
@@ -365,7 +365,7 @@
 
     function getTicket(isBottom, currentScroll) {
         getUserRole();
-        fetch(`http://localhost:8000/ticket/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/${window.location.pathname.split('/').pop()}`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -416,7 +416,7 @@
         const requestBody = {
             message: messageContent
         };
-        fetch(`http://localhost:8000/ticket/write/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/write/${window.location.pathname.split('/').pop()}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -446,7 +446,7 @@
     }
 
     function closeTicket() {
-        fetch(`http://localhost:8000/ticket/close/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/close/${window.location.pathname.split('/').pop()}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -461,7 +461,7 @@
     }
 
     function deleteTicket() {
-        fetch(`http://localhost:8000/ticket/delete/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/delete/${window.location.pathname.split('/').pop()}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -481,7 +481,7 @@
 
     function getUserRole() {
         if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
-            fetch(`http://localhost:8000/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
+            fetch(`https://api.ardeco.app/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

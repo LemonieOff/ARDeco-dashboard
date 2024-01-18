@@ -262,10 +262,10 @@
             </li>
             <li><a href="/users"><i class="fa-solid fa-user icon"
                                     style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> User</a></li>
-            <li><i class="fa-solid fa-book icon" style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>Catalog
+            <li><i class="fa-solid fa-book icon" style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Catalog
             </li>
             <li><i class="fa-solid fa-chart-simple icon"
-                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>Statistics
+                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Statistics
             </li>
         </ul>
         <div class="line"></div>
@@ -325,12 +325,12 @@
     let closedTickets = 0;
     let deletedTickets = 0;
     getUserRole();
-    fetch('http://localhost:8000/ticket/stats', {
+    fetch('https://api.ardeco.app/ticket/stats', {
         method: 'GET',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+       //     'Cookie': `jwt=${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
         }
     })
         .then(response => response.json())
@@ -373,12 +373,12 @@
         });
 
 
-    fetch('http://localhost:8000/ticket/stats/last7days', {
+    fetch('https://api.ardeco.app/ticket/stats/last7days', {
         method: 'GET',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+         //   'Cookie': `jwt=${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
         }
     }).then(response => response.json())
         .then(data => {
@@ -474,15 +474,15 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         getUserRole();
-        fetch('http://localhost:8000/ticket/pending', {
+        fetch('https://api.ardeco.app/ticket/pending', {
             method: 'GET',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+       //         'Cookie': `jwt=${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
             }
         })
-            .then(response => response.json())  // Transforme la réponse en objet JavaScript
+            .then(response => response.json())
             .then(data => {
                 const ticketsList = document.getElementById('open-tickets-list');
 
@@ -499,7 +499,7 @@
 
     function getUserRole() {
         if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
-            fetch(`http://localhost:8000/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
+            fetch(`https://api.ardeco.app/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

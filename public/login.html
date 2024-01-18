@@ -76,11 +76,12 @@
     document.getElementById('login-form').addEventListener('submit', function (event) {
         document.getElementById('errorDiv').innerHTML = "";
         event.preventDefault();
-        fetch('http://localhost:8000/login', {
+        fetch('https://api.ardeco.app/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+
             body: JSON.stringify({
                 email: document.querySelector('#login-form input[type="text"]').value,
                 password: document.querySelector('#login-form input[type="password"]').value
@@ -112,7 +113,7 @@
     });
 
     function getUserRole() {
-        fetch(`http://localhost:8000/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
+        fetch(`https://api.ardeco.app/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

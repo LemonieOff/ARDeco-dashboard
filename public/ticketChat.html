@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charSet="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Support Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
@@ -293,37 +293,37 @@
 </head>
 <body>
 <main>
-    <section class="card full-height">
+    <section className="card full-height">
         <h2>ARDeco Administration tool</h2>
-        <div class="line"></div>
+        <div className="line"></div>
         <ul id="categories">
-            <li class="selected"><a href="/dashboard"><i class="fa-solid fa-ticket icon selected"
-                                    style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
+            <li className="selected"><a href="/dashboard"><i className="fa-solid fa-ticket icon selected"
+                                                             style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
                 Tickets
             </a></li>
-            <li><a href="/users"><i class="fa-solid fa-user icon"
+            <li><a href="/users"><i className="fa-solid fa-user icon"
                                     style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
                 User</a></li>
-            <li><i class="fa-solid fa-book icon"
+            <li><i className="fa-solid fa-book icon"
                    style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Catalog
             </li>
-            <li><i class="fa-solid fa-chart-simple icon"
+            <li><i className="fa-solid fa-chart-simple icon"
                    style="border-radius: 9px; padding: 10px;margin-right: 3px;"></i> Statistics
             </li>
         </ul>
-        <div class="line"></div>
+        <div className="line"></div>
         <div style="background: #1BCFC4; height: 20%; width: 80%; border-radius: 15px; color: white; padding: 10%">
             <h1>New categories may arrive in a future update of the admin dashboard</h1>
         </div>
         <button id="mode-toggle">Theme switch</button>
     </section>
     <div id="chat">
-        <section class="card full-height2">
+        <section className="card full-height2">
             <h2>Chat</h2>
             <div id="messages-list"></div>
         </section>
-        <section class="card text-height text-input-container" style="margin-top: 2vh">
-            <label for="answer"></label>
+        <section className="card text-height text-input-container" style="margin-top: 2vh">
+            <label htmlFor="answer"></label>
             <input type="text" id="answer" name="answer">
             <button id="sendButton">Respond</button>
             <button id="closeButton">Close ticket</button>
@@ -369,8 +369,8 @@
             method: 'GET',
             credentials: 'include',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+                'Content-Type': 'application/json'//,
+                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
             }
         })
             .then(function (response) {
@@ -420,8 +420,8 @@
             method: 'PUT',
             credentials: 'include',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+                'Content-Type': 'application/json'//,
+                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
             },
             body: JSON.stringify(requestBody)
         }).then(response => response.json())
@@ -450,8 +450,8 @@
             method: 'PUT',
             credentials: 'include',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+                'Content-Type': 'application/json'//,
+                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
             }
         }).then(response => response.json()).then(function () {
             window.location.href = '/dashboard'
@@ -465,8 +465,8 @@
             method: 'PUT',
             credentials: 'include',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+                'Content-Type': 'application/json'//,
+                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
             }
         }).then(response => response.json()).then(function () {
             window.location.href = '/dashboard'
@@ -480,9 +480,12 @@
     }, 10000);
 
     function getUserRole() {
-        if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
-            fetch(`https://api.ardeco.app/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
+        /*if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
+            fetch(`https://api.ardeco.app/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {*/
+        if (localStorage.getItem("uid")) {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
                 method: 'GET',
+                credentials: "include",
                 headers: {
                     'Content-Type': 'application/json'
                 },

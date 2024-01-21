@@ -78,6 +78,7 @@
         event.preventDefault();
         fetch('https://api.ardeco.app/login', {
             method: 'POST',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -93,9 +94,8 @@
             console.log(data);
             if (data.status === 'OK') {
                 localStorage.setItem('jwt', data.data.jwt);
+                localStorage.setItem('uid', data.data.userID);
                 console.log('jwt', data.data);
-                document.cookie = `jwt=${data.data.jwt}`;
-                document.cookie = `uid=${data.data.userID}`;
                 getUserRole();
             } else {
                 const loginForm = document.getElementById('errorDiv');
@@ -113,8 +113,9 @@
     });
 
     function getUserRole() {
-        fetch(`https://api.ardeco.app/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {
+        fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
             method: 'GET',
+            credentials: "include",
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -143,9 +144,6 @@
     }
 
     window.onload = function () {
-        if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
-            //(rc     getUserRole();
-        }
     };
 
 </script>

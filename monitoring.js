@@ -1,15 +1,12 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const cors = require('cors'); // Require the cors package
+const cors = require('cors');
 
-// Port sur lequel le serveur sera écouté
 const port = 3001;
 
-// Servir des fichiers statiques (votre HTML, CSS, JS, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/login.html'));
 });
@@ -37,7 +34,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Démarrer le serveur
 app.listen(port, () => {
     console.log(`Serveur démarré sur http://localhost:${port}`);
 });

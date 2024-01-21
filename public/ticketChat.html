@@ -369,8 +369,7 @@
             method: 'GET',
             credentials: 'include',
             headers: {
-                'Content-Type': 'application/json'//,
-                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+                'Content-Type': 'application/json'
             }
         })
             .then(function (response) {
@@ -397,7 +396,6 @@
 
                     message.innerHTML = messages[i].sender + ":" + '<br>' + messages[i].content + '<br><br>' + date.toLocaleString();
                     document.querySelector('#messages-list').appendChild(message);
-                    //  document.querySelector('#messages-list').appendChild(dateText);
                 }
                 if (isBottom)
                     document.querySelector('#messages-list').scrollTop = document.querySelector('#messages-list').scrollHeight;
@@ -420,8 +418,7 @@
             method: 'PUT',
             credentials: 'include',
             headers: {
-                'Content-Type': 'application/json'//,
-                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
         }).then(response => response.json())
@@ -451,7 +448,6 @@
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'//,
-                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
             }
         }).then(response => response.json()).then(function () {
             window.location.href = '/dashboard'
@@ -466,7 +462,6 @@
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'//,
-                //'Authorization': `Bearer ${document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]}`
             }
         }).then(response => response.json()).then(function () {
             window.location.href = '/dashboard'
@@ -480,8 +475,6 @@
     }, 10000);
 
     function getUserRole() {
-        /*if (document.cookie.split('; ').find(row => row.startsWith('jwt='))) {
-            fetch(`https://api.ardeco.app/user/${document.cookie.split('; ').find(row => row.startsWith('uid=')).split('=')[1]}`, {*/
         if (localStorage.getItem("uid")) {
             fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
                 method: 'GET',

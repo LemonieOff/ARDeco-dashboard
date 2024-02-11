@@ -326,7 +326,7 @@
     let closedTickets = 0;
     let deletedTickets = 0;
     getUserRole();
-    fetch('http://localhost:8000/ticket/stats', {
+    fetch('https://api.ardeco.app/ticket/stats', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -373,7 +373,7 @@
         });
 
 
-    fetch('http://localhost:8000/ticket/stats/last7days', {
+    fetch('https://api.ardeco.app/ticket/stats/last7days', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -473,7 +473,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         getUserRole();
-        fetch('http://localhost:8000/ticket/pending', {
+        fetch('https://api.ardeco.app/ticket/pending', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -497,7 +497,7 @@
 
     function getUserRole() {
         if (localStorage.getItem("uid")) {
-            fetch(`http://localhost:8000/user/${localStorage.getItem("uid")}`, {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
                 method: 'GET',
                 credentials: "include",
                 headers: {

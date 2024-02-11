@@ -76,7 +76,7 @@
     document.getElementById('login-form').addEventListener('submit', function (event) {
         document.getElementById('errorDiv').innerHTML = "";
         event.preventDefault();
-        fetch('http://localhost:8000/login', {
+        fetch('https://api.ardeco.app/login', {
             method: 'POST',
             credentials: "include",
             headers: {
@@ -113,7 +113,7 @@
     });
 
     function getUserRole() {
-        fetch(`http://localhost:8000/user/${localStorage.getItem("uid")}`, {
+        fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
             method: 'GET',
             credentials: "include",
             headers: {

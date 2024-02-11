@@ -312,7 +312,7 @@
     let admin = 0;
     let company = 0;
     getUserRole();
-    fetch('http://localhost:8000/user/usertypes', {
+    fetch('https://api.ardeco.app/user/usertypes', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -364,7 +364,7 @@
 
     function getUserRole() {
         if (localStorage.getItem("uid")) {
-            fetch(`http://localhost:8000/user/${localStorage.getItem("uid")}`, {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
                 method: 'GET',
                 credentials: "include",
                 headers: {

@@ -365,7 +365,7 @@
 
     function getTicket(isBottom, currentScroll) {
         getUserRole();
-        fetch(`http://localhost:8000/ticket/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/${window.location.pathname.split('/').pop()}`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -414,7 +414,7 @@
         const requestBody = {
             message: messageContent
         };
-        fetch(`http://localhost:8000/ticket/write/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/write/${window.location.pathname.split('/').pop()}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -443,7 +443,7 @@
     }
 
     function closeTicket() {
-        fetch(`http://localhost:8000/ticket/close/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/close/${window.location.pathname.split('/').pop()}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -457,7 +457,7 @@
     }
 
     function deleteTicket() {
-        fetch(`http://localhost:8000/ticket/delete/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/ticket/delete/${window.location.pathname.split('/').pop()}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -476,7 +476,7 @@
 
     function getUserRole() {
         if (localStorage.getItem("uid")) {
-            fetch(`http://localhost:8000/user/${localStorage.getItem("uid")}`, {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
                 method: 'GET',
                 credentials: "include",
                 headers: {

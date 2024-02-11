@@ -2,7 +2,7 @@
 <head>
     <meta charSet="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Support Dashboard</title>
+    <title>ARDeco Statistics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <style>
 
@@ -257,16 +257,16 @@
         <h2>ARDeco Administration tool</h2>
         <div class="line"></div>
         <ul id="categories">
-            <li class="selected"><i class="fa-solid fa-ticket icon iselected"
-                                        style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Tickets
+            <li><a href="/dashboard"><i class="fa-solid fa-ticket icon iselected"
+                                        style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Tickets</a>
             </li>
             <li><a href="/users"><i class="fa-solid fa-user icon"
                                     style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> User</a></li>
             <li><i class="fa-solid fa-book icon" style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
                 Catalog
             </li>
-            <li><a href="/statistics"><i class="fa-solid fa-chart-simple icon"
-                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Statistics</a>
+            <li class="selected"><i class="fa-solid fa-chart-simple icon"
+                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Statistics
             </li>
         </ul>
         <div class="line"></div>
@@ -277,33 +277,20 @@
 
     </section>
     <section class="card">
-        <h2>Global tickets status</h2>
+        <h2>Users graphic</h2>
         <canvas id="priority-chart"></canvas>
     </section>
     <section class="card">
-        <h2>Pending tickets</h2>
-        <ul id="open-tickets-list"></ul>
+
     </section>
     <section class="card full-width">
-        <h2>Tickets of the Week</h2>
         <section class="graph">
-            <canvas id="week-chart"></canvas>
-            <div class="stats-week">
-                <h4 id="0d">Today </h4>
-                <h4 id="1d">Yesterday </h4>
-                <h4 id="2d">2 days ago </h4>
-                <h4 id="3d">3 days ago </h4>
-                <h4 id="4d">4 days ago </h4>
-                <h4 id="5d">5 days ago </h4>
-                <h4 id="6d">6 days ago </h4>
-            </div>
         </section>
     </section>
 </main>
 </body>
 <script>
 
-    let weekChart;
 
     if (localStorage.getItem('mode') === 'dark') {
         document.body.classList.add('dark-mode');
@@ -320,13 +307,12 @@
     });
 
     const priorityChartCtx = document.getElementById('priority-chart').getContext('2d');
-    const weekChartCtx = document.getElementById('week-chart').getContext('2d');
 
-    let openTickets = 0;
-    let closedTickets = 0;
-    let deletedTickets = 0;
+    let user = 0;
+    let admin = 0;
+    let company = 0;
     getUserRole();
-    fetch('http://localhost:8000/ticket/stats', {
+    fetch('http://localhost:8000/user/usertypes', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -335,15 +321,15 @@
     })
         .then(response => response.json())
         .then(data => {
-            openTickets = data.data.pending;
-            closedTickets = data.data.closed;
-            deletedTickets = data.data.deleted;
+            user = data.data.user;
+            admin = data.data.admin;
+            company = data.data.company;
             const priorityChart = new Chart(priorityChartCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['pending', 'closed', 'deleted'],
+                        labels: ['admin', 'user', 'company'],
                         datasets: [{
-                            data: [openTickets, closedTickets, deletedTickets],
+                            data: [admin, user, company],
                             backgroundColor: ['#FE9496', '#1BCFC4', '#9E58FF'],
                             borderWidth: 0
                         }]
@@ -368,132 +354,13 @@
             );
         })
         .catch(error => {
-            console.error('Erreur lors de la récupération des tickets:', error);
+            console.error('Erreur lors de la récupération des utilisateurs:', error);
             console.log(document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]);
         });
 
 
-    fetch('http://localhost:8000/ticket/stats/last7days', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => response.json())
-        .then(data => {
-            let today = data.data.days.today;
-            let yesterday = data.data.days.yesterday;
-            let twoDaysAgo = data.data.days.twoDaysAgo;
-            let threeDaysAgo = data.data.days.threeDaysAgo;
-            let fourDaysAgo = data.data.days.fourDaysAgo;
-            let fiveDaysAgo = data.data.days.fiveDaysAgo;
-            let sixDaysAgo = data.data.days.sixDaysAgo;
 
-            document.getElementById('6d').innerText += ' ' + sixDaysAgo + " tickets were created";
-            document.getElementById('5d').innerText += ' ' + fiveDaysAgo + " tickets were created";
-            document.getElementById('4d').innerText += ' ' + fourDaysAgo + " tickets were created";
-            document.getElementById('3d').innerText += ' ' + threeDaysAgo + " tickets were created";
-            document.getElementById('2d').innerText += ' ' + twoDaysAgo + " tickets were created";
-            document.getElementById('1d').innerText += ' ' + yesterday + " tickets were created";
-            document.getElementById('0d').innerText += ' ' + today + " tickets were created";
 
-            const gradient = weekChartCtx.createLinearGradient(0, 0, 0, 400);
-            let border;
-            if (localStorage.getItem('mode') === 'dark') {
-                gradient.addColorStop(0, 'rgba(158,88,255,0.88)');
-                gradient.addColorStop(1, '#4d2c7c');
-                border = '#9E58FF';
-            } else {
-                gradient.addColorStop(0, '#ffbdc0');
-                gradient.addColorStop(1, '#FFFFFF');
-                border = '#FE9496';
-            }
-
-            weekChart = new Chart(weekChartCtx, {
-                type: 'line',
-                data: {
-                    labels: ['6 days ago', '5 days ago', '4 days ago', '3 days ago', '2 days ago', 'yesterday', 'today'],
-                    datasets: [{
-                        label: 'Tickets created this day',
-                        fill: true,
-                        data: [sixDaysAgo, fiveDaysAgo, fourDaysAgo, threeDaysAgo, twoDaysAgo, yesterday, today],
-                        backgroundColor: gradient,
-                        borderColor: border,
-                        borderWidth: 1,
-                        tension: 0.3,
-                        pointRadius: 1,
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            grid: {
-                                display: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            })
-        })
-
-    function updateWeekChartGradient() {
-        let gradient;
-        let border;
-        let labelColors;
-        if (document.body.classList.contains('dark-mode')) {
-            gradient = weekChartCtx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(158,88,255,0.88)');
-            gradient.addColorStop(1, '#4d2c7c');
-            border = '#9E58FF';
-            labelColors = '#FFFFFF';
-        } else {
-            gradient = weekChartCtx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, '#ffbdc0');
-            gradient.addColorStop(1, '#FFFFFF');
-            border = '#FE9496';
-            labelColors = '#6A7482';
-        }
-        weekChart.data.datasets[0].backgroundColor = gradient;
-        weekChart.data.datasets[0].borderColor = border;
-        weekChart.options.plugins.legend.labels.color = labelColors;
-        weekChart.update();
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        getUserRole();
-        fetch('http://localhost:8000/ticket/pending', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                const ticketsList = document.getElementById('open-tickets-list');
-
-                data.data.forEach(ticket => {
-                    const ticketElement = document.createElement('li');
-                    ticketElement.innerHTML = `<a href="/ticket/${ticket.id}" class="title"><h>${ticket.title}</h><p class="description">${ticket.description}</p></a>`;
-                    ticketsList.appendChild(ticketElement);
-                });
-            })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des tickets:', error);
-            });
-    });
 
     function getUserRole() {
         if (localStorage.getItem("uid")) {

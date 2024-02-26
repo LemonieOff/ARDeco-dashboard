@@ -2,7 +2,7 @@
 <head>
     <meta charSet="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Support Dashboard</title>
+    <title>ARDeco user details</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <style>
 
@@ -72,7 +72,7 @@
         }
 
         .full-height2 {
-            height: 79.5vh;
+            height: 90.5vh;
             width: 70vw;
         }
 
@@ -116,7 +116,7 @@
         }
 
 
-        #chat {
+        #userCard {
             display: flex;
             flex-direction: column;
         }
@@ -289,6 +289,28 @@
             background-color: #4d2c7c;
         }
 
+        #editButton {
+            margin-top: 10px;
+            background-color: #1BCFC4;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #editButton:hover {
+            background-color: #15a29a;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+
+
     </style>
 </head>
 <body>
@@ -297,11 +319,11 @@
         <h2>ARDeco Administration tool</h2>
         <div class="line"></div>
         <ul id="categories">
-            <li class="selected"><a href="/dashboard"><i class="fa-solid fa-ticket icon selected"
+            <li><a href="/dashboard"><i class="fa-solid fa-ticket icon"
                                                              style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
                 Tickets
             </a></li>
-            <li><a href="/users"><i class="fa-solid fa-user icon"
+            <li class="selected"><a href="/users"><i class="fa-solid fa-user icon iselected"
                                     style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
                 User</a></li>
             <li><i class="fa-solid fa-book icon"
@@ -317,19 +339,25 @@
         </div>
         <button id="mode-toggle">Theme switch</button>
     </section>
-    <div id="chat">
+    <div id="userCard">
         <section class="card full-height2">
-            <h2>Chat</h2>
-            <div id="messages-list"></div>
-        </section>
-        <section class="card text-height text-input-container" style="margin-top: 2vh">
-            <label htmlFor="answer"></label>
-            <input type="text" id="answer" name="answer">
-            <button id="sendButton">Respond</button>
-            <button id="closeButton">Close ticket</button>
-            <button id="deleteButton">Delete ticket</button>
-        </section>
+            <h2>User details</h2>
+            <div id="info-list">
+                <p id="firstname">Firstname Placeholder</p>
+                <p id="lastname">Lastname Placeholder</p>
+                <p id="role">Role Placeholder</p>
+                <p id="mail">Mail: Placeholder</p>
+                <p id="phone">Phone: Placeholder</p>
+                <p id="address">City: Placeholder</p>
+                <button id="editButton">Edit</button>
+            </div>
+            <div>
+                Order List :
+                <ul id="order-list">
 
+                </ul>
+            </div>
+        </section>
     </div>
 
 
@@ -348,24 +376,11 @@
         } else {
             localStorage.setItem('mode', 'light');
         }
-        updateWeekChartGradient();
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('sendButton').addEventListener('click', respondToTicket);
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('closeButton').addEventListener('click', closeTicket);
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('deleteButton').addEventListener('click', deleteTicket);
-    });
-
-    function getTicket(isBottom, currentScroll) {
+    function getUser() {
         getUserRole();
-        fetch(`https://api.ardeco.app/ticket/${window.location.pathname.split('/').pop()}`, {
+        fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -377,102 +392,61 @@
             }).then(function (data) {
             console.log(data);
             if (data.status === 'OK') {
-                console.log(data.data);
-                let messages = JSON.parse(data.data.messages);
-                for (let i = 0; i < messages.length; i++) {
-                    console.log(messages[i]);
-                    let message = document.createElement('div');
-                    let dateText = document.createElement('div');
-
-                    if (messages[i].sender === "Support") {
-                        message.classList.add('right')
-                        dateText.classList.add('right')
-                    }
-                    message.classList.add('message');
-                    let string = messages[i].timestamp.replace(/,/g, '');
-                    let timestamp = parseInt(string, 10);
-                    let date = new Date(timestamp);
-                    dateText.innerHTML = date.toLocaleString();
-
-                    message.innerHTML = messages[i].sender + ":" + '<br>' + messages[i].content + '<br><br>' + date.toLocaleString();
-                    document.querySelector('#messages-list').appendChild(message);
-                }
-                if (isBottom)
-                    document.querySelector('#messages-list').scrollTop = document.querySelector('#messages-list').scrollHeight;
-                else
-                    document.querySelector('#messages-list').scrollTop = currentScroll;
+                document.getElementById('firstname').innerText = data.data.firstname.toUpperCase();
+                document.getElementById('lastname').innerText = data.data.lastname.toUpperCase();
+                document.getElementById('role').innerText = data.data.role;
+                document.getElementById('mail').innerText = "Mail : " + data.data.email;
+                document.getElementById('phone').innerText = "Phone : " + data.data.phone;
+                document.getElementById('address').innerText = "City : " + data.data.city;
+            } else {
+                alert('An error occurred while fetching user details');
             }
         }).catch(error => {
             console.error(error);
+            alert('An error occurred while fetching user details' + error);
         });
     }
 
-    getTicket(true, 0);
 
-    function respondToTicket() {
-        const messageContent = document.getElementById('answer').value;
-        const requestBody = {
-            message: messageContent
-        };
-        fetch(`https://api.ardeco.app/ticket/write/${window.location.pathname.split('/').pop()}`, {
-            method: 'PUT',
+    getUser();
+    getOrderHistory();
+
+    function getOrderHistory() {
+        fetch(`https://api.ardeco.app/order_history/user/${window.location.pathname.split('/').pop()}?mode=details`, {
+            method: 'GET',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        }).then(response => response.json())
-            .then(data => {
-                console.log('Message sent:', data);
-                document.getElementById('answer').value = '';
-                setTimeout(() => {
-                    refreshMessages();
-                }, 500);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-
-    function refreshMessages() {
-        let isBottom = document.querySelector('#messages-list').scrollHeight - document.querySelector('#messages-list').scrollTop === document.querySelector('#messages-list').clientHeight;
-        let currentScroll = document.querySelector('#messages-list').scrollTop;
-        const messagesContainer = document.querySelector('#messages-list');
-        messagesContainer.innerHTML = '';
-        getTicket(isBottom, currentScroll);
-    }
-
-    function closeTicket() {
-        fetch(`https://api.ardeco.app/ticket/close/${window.location.pathname.split('/').pop()}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'//,
             }
-        }).then(response => response.json()).then(function () {
-            window.location.href = '/dashboard'
+        })
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                data.data.forEach(order => {
+                    const orderList = document.getElementById('order-list');
+                    const orderItem = document.createElement('li');
+                    orderItem.innerText = `Order ID: ${order.id} - Date: ${new Date(order.datetime).toDateString()} - Total amount: ${order.total_amount}`;
+                    orderList.appendChild(orderItem);
+                    const furnitureList = document.createElement('ul');
+                    order.furniture.forEach(furniture => {
+                        const furnitureItem = document.createElement('li');
+                        furnitureItem.innerText = `Furniture ID: ${furniture.id}`;
+                        furnitureList.appendChild(furnitureItem);
+                    });
+                    orderList.appendChild(furnitureList);
+                    console.log(order);
+                });
+
+            } else {
+                alert('An error occurred while fetching user details');
+            }
         }).catch(error => {
-            console.error('Error:', error);
+            console.error(error);
+            alert('An error occurred while fetching user details' + error);
         });
     }
-
-    function deleteTicket() {
-        fetch(`https://api.ardeco.app/ticket/delete/${window.location.pathname.split('/').pop()}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'//,
-            }
-        }).then(response => response.json()).then(function () {
-            window.location.href = '/dashboard'
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-    }
-
-    setInterval(() => {
-        refreshMessages();
-    }, 10000);
 
     function getUserRole() {
         if (localStorage.getItem("uid")) {
@@ -503,5 +477,78 @@
             window.location = "/";
         }
     }
+
+    document.getElementById('editButton').addEventListener('click', function () {
+        const isEditing = document.getElementById('editButton').innerText === 'Save';
+
+        if (!isEditing) {
+            makeFieldsEditable();
+            document.getElementById('editButton').innerText = 'Save';
+        } else {
+            saveUserDetails();
+            document.getElementById('editButton').innerText = 'Edit';
+        }
+    });
+
+    function makeFieldsEditable() {
+        const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list
+        fields.forEach(field => {
+            const element = document.getElementById(field);
+            const value = element.innerText.split(': ')[1] || element.innerText;
+            // Avoid creating input for 'role'
+            element.innerHTML = `<input type="text" value="${value}" id="edit-${field}">`;
+        });
+    }
+
+    function saveUserDetails() {
+        const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list
+        let updatedUserDetails = {};
+        fields.forEach(field => {
+            const inputElement = document.getElementById(`edit-${field}`);
+            if (inputElement) {
+                const value = inputElement.value;
+                // Update the display without changing the role
+                document.getElementById(field).innerText = `${field.charAt(0).toUpperCase() + field.slice(1)}: ${value}`;
+                updatedUserDetails[field] = value;
+            } else {
+                console.error(`Element for ${field} not found`);
+            }
+        });
+
+        // Proceed with the fetch to update user details without including 'role'
+        fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                first_name: updatedUserDetails['firstname'],
+                last_name: updatedUserDetails['lastname'],
+                // Do not update the role here
+                email: updatedUserDetails['mail'],
+                phone: updatedUserDetails['phone'],
+                city: updatedUserDetails['address']
+            })
+        })
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                alert('User details updated successfully');
+            } else {
+                alert('An error occurred while updating user details');
+            }
+        }).catch(error => {
+            console.error(error);
+            alert('An error occurred while updating user details' + error);
+        });
+    }
+
+
+
+
+
 </script>
 </html>

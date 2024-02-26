@@ -19,9 +19,18 @@ app.get('/statistics', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/statistics.html'));
 });
 
+app.get('/users', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/users.html'));
+});
+
 app.get('/ticket/:ticketId', (req, res) => {
     const ticketId = req.params.ticketId;
     res.sendFile(path.join(__dirname, 'public/ticketChat.html'));
+});
+
+app.get('/user/:userId', (req, res) => {
+    const userId = req.params.userId;
+    res.sendFile(path.join(__dirname, 'public/userDetails.html'));
 });
 
 const corsOptions = {

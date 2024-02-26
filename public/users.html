@@ -2,7 +2,7 @@
 <head>
     <meta charSet="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARDeco Statistics</title>
+    <title>ARDeco Users</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <style>
 
@@ -54,6 +54,7 @@
             background-color: white;
             border-radius: 10px;
             padding: 20px;
+            padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             height: 45vh;
         }
@@ -77,15 +78,15 @@
             width: 142vh;
         }
 
-        #open-tickets-list {
+        #users-list {
             width: auto;
-            height: 370px;
+            height: 340px;
             overflow: auto;
             list-style-type: none;
             padding: 0;
         }
 
-        #open-tickets-list li {
+        #users-list li {
             background-color: #ECFFFE;
             padding: 10px 15px;
             display: flex;
@@ -96,19 +97,55 @@
             box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
         }
 
-        #open-tickets-list li:last-child {
+        #users-list li:last-child {
             border-bottom: none;
         }
 
-        #open-tickets-list li a {
+        #users-list li a {
             text-decoration: none;
             color: #6A7482;
             font-size: 16px;
             flex-grow: 1;
         }
 
-        #open-tickets-list li a:hover {
+        #users-list li a:hover {
 
+        }
+
+        #company-list {
+            width: auto;
+            height: 370px;
+            overflow: auto;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #company-list li {
+            background-color: #ECFFFE;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
+        }
+
+        #company-list li:last-child {
+            border-bottom: none;
+        }
+
+        #company-list li a {
+            text-decoration: none;
+            color: #6A7482;
+            font-size: 16px;
+            flex-grow: 1;
+        }
+
+        #company-list li a:hover {
+            background: #ECFFFE;
+            color: #6A7482;
+            box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
         }
 
         #priority-chart {
@@ -163,6 +200,8 @@
             color: white;
         }
 
+
+
         h4 {
             margin-bottom: 3px;
         }
@@ -207,12 +246,12 @@
             box-shadow: none;
         }
 
-        .dark-mode #open-tickets-list li {
+        .dark-mode #users-list li {
             background-color: #18202D;
             box-shadow: none;
         }
 
-        .dark-mode #open-tickets-list li a {
+        .dark-mode #users-list li a {
             color: white;
         }
 
@@ -260,13 +299,13 @@
             <li><a href="/dashboard"><i class="fa-solid fa-ticket icon"
                                         style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Tickets</a>
             </li>
-            <li><a href="/users"><i class="fa-solid fa-user icon"
+            <li class="selected"><a href="/users"><i class="fa-solid fa-user icon iselected"
                                     style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> User</a></li>
             <li><i class="fa-solid fa-book icon" style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
                 Catalog
             </li>
-            <li class="selected"><i class="fa-solid fa-chart-simple icon iselected"
-                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Statistics
+            <li><a href="/statistics"><i class="fa-solid fa-chart-simple icon"
+                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Statistics</a>
             </li>
         </ul>
         <div class="line"></div>
@@ -277,18 +316,15 @@
 
     </section>
     <section class="card">
-        <h2>Users graphic</h2>
-        <canvas id="priority-chart"></canvas>
-
+        <div style="display: flex">
+            <h2>clients list</h2>
+            <input type="text" id="searchInput" placeholder="Search users..." style="margin-left: 55%; width: calc(30% - 40px); box-sizing: border-box; border: none; outline: none; box-shadow: none; background: none">
+        </div>
+        <ul id="users-list"></ul>
     </section>
     <section class="card">
-        <p id="active">Active users</p>
-        <p id="deleted">Deleted users</p>
-        <p id="total">Total users</p>
-    </section>
-    <section class="card full-width">
-        <section class="graph">
-        </section>
+        <h2>company list</h2>
+        <ul id="company-list"></ul>
     </section>
 </main>
 </body>
@@ -309,74 +345,67 @@
         updateWeekChartGradient();
     });
 
-    const priorityChartCtx = document.getElementById('priority-chart').getContext('2d');
 
-    let user = 0;
-    let admin = 0;
-    let company = 0;
-    let deleted = 0;
-    let active = 0;
-    getUserRole();
-    fetch('https://api.ardeco.app/user/usertypes', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-
-
-            user = data.data.user;
-            admin = data.data.admin;
-            company = data.data.company;
-            deleted = data.data.deleted;
-            active = data.data.totalActive;
-
-
-
-            document.getElementById('active').innerText = `Active users: ${active}`;
-            document.getElementById('deleted').innerText = `Deleted users: ${deleted}`;
-            document.getElementById('total').innerText = `Total users: ${active + deleted}`;
-
-
-
-            const priorityChart = new Chart(priorityChartCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['admin', 'user', 'company'],
-                        datasets: [{
-                            data: [admin, user, company],
-                            backgroundColor: ['#FE9496', '#1BCFC4', '#9E58FF'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    boxWidth: 20,
-                                    font: {
-                                        size: 20
-                                    }
-                                }
-                            }
-                        },
-                        responsive: false,
-                        maintainAspectRatio: false,
-                        cutout: '70%'
-                    }
-                }
-            );
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('https://api.ardeco.app/user/basicusers', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         })
-        .catch(error => {
-            console.error('Erreur lors de la récupération des utilisateurs:', error);
-            console.log(document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]);
+            .then(response => response.json())
+            .then(data => {
+                const usersList = document.getElementById('users-list');
+
+                data.data.forEach(user => {
+                    const userElement = document.createElement('li');
+                    console.log(user);
+                    console.log(user.first_name);
+                    userElement.innerHTML = `<a href="/user/${user.id}">${user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1)} ${user.last_name.charAt(0).toUpperCase() + user.last_name.slice(1)}</a>`;
+                    usersList.appendChild(userElement);
+                });
+            })
+            .catch(error => {
+                console.error('ERROR:', error);
+            });
+        fetch('https://api.ardeco.app/user/companies', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const companyList = document.getElementById('company-list');
+
+                data.data.forEach(company => {
+                    const companyElement = document.createElement('li');
+                    console.log(company);
+                    console.log(company.name);
+                    companyElement.innerHTML = `<a href="/company/${company.id}">${company.first_name} ${company.last_name}</a>`;
+                    companyList.appendChild(companyElement);
+                });
+            })
+            .catch(error => {
+                console.error('ERROR:', error);
+            });
+    });
+
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        var searchValue = this.value.toLowerCase();
+        var listItems = document.querySelectorAll('#users-list li');
+
+        listItems.forEach(function(item) {
+            var text = item.textContent.toLowerCase();
+            if (text.includes(searchValue)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
         });
-
-
+    });
 
 
 

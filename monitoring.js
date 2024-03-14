@@ -33,6 +33,13 @@ app.get('/user/:userId', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/userDetails.html'));
 });
 
+app.get('/company/:companyId', (req, res) => {
+    const companyId = req.params.company
+    res.sendFile(path.join(__dirname, 'public/companyDetails.html'));
+});
+
+
+
 const corsOptions = {
     origin: [
         "http://localhost:3000",
@@ -50,3 +57,5 @@ app.use(cors(corsOptions));
 app.listen(port, () => {
     console.log(`Serveur démarré sur http://localhost:${port}`);
 });
+
+module.exports = app;

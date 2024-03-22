@@ -350,6 +350,8 @@
         <p id="phone">Phone: Placeholder</p>
         <p id="address">City: Placeholder</p>
         <button id="editButton">Edit</button>
+        <Button id="closeAccount">Close account</Button>
+        <button id="resetAPI">Reset API key</button>
       </div>
     </section>
   </div>
@@ -483,6 +485,53 @@
       document.getElementById('editButton').innerText = 'Edit';
     }
   });
+
+    document.getElementById('closeAccount').addEventListener('click', function () {
+        fetch(`https://api.ardeco.app/user/close/${window.location.pathname.split('/').pop()}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        })
+                .then(function (response) {
+                return response.json();
+                }).then(function (data) {
+        console.log(data);
+        if (data.status === 'OK') {
+            alert('User account closed successfully');
+            window.location = '/';
+        } else {
+            alert('An error occurred while closing user account');
+        }
+        }).catch(error => {
+        console.error(error);
+        alert('An error occurred while closing user account' + error);
+        });
+    });
+
+    document.getElementById('resetAPI').addEventListener('click', function () {
+        fetch(`https://api.ardeco.app/company/resetToken?id=${window.location.pathname.split('/').pop()}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        })
+                .then(function (response) {
+                return response.json();
+                }).then(function (data) {
+        console.log(data);
+        if (data.status === 'OK') {
+            alert('API key reset successfully');
+        } else {
+            alert('An error occurred while resetting API key');
+        }
+        }).catch(error => {
+        console.error(error);
+        alert('An error occurred while resetting API key' + error);
+        });
+    });
 
   function makeFieldsEditable() {
     const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list

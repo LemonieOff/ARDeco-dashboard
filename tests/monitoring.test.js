@@ -51,3 +51,17 @@ describe('GET /user/:userId', () => {
         expect(response.statusCode).toBe(200);
     });
 });
+
+describe('GET /company/:companyId', () => {
+    it('responds with expected HTTP status code', async () => {
+        const response = await request(server).get('/company/1');
+        expect(response.statusCode).toBe(200);
+    });
+});
+
+describe('GET /catalog', () => {
+    it('responds with expected HTTP status code', async () => {
+        const response = await request(server).get('/catalog');
+        expect(response.statusCode).toBe(200);
+    });
+});

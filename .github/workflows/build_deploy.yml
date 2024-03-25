@@ -20,9 +20,9 @@ jobs:
           uploads: |
             ./ => /opt/ardeco/support
           ignore: |
-            .git/
-            .github/
-            tests/
+            .git
+            .github
+            tests
             jest.config.js
             README.md
 

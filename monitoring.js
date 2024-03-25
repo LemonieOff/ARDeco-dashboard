@@ -38,6 +38,10 @@ app.get('/company/:companyId', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/companyDetails.html'));
 });
 
+app.get('/catalog', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/catalog.html'));
+});
+
 
 
 const corsOptions = {

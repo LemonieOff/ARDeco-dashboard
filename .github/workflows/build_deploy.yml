@@ -20,3 +20,13 @@ jobs:
           local_path: '.'
           remote_path: '/opt/ardeco/support'
           sftp_only: true
+
+      - name: restart service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.SERVER_HOST }}
+          username: ${{ vars.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /opt/ardeco/support
+            touch timestamp

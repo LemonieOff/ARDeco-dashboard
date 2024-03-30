@@ -26,6 +26,16 @@ jobs:
             jest.config.js
             README.md
 
+      - name: Install dependencies on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.SERVER_HOST }}
+          username: ${{ vars.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /opt/ardeco/support
+            npm install
+
       - name: Log timestamp
         uses: appleboy/ssh-action@master
         with:

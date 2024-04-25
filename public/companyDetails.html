@@ -349,10 +349,16 @@
         <p id="mail">Mail: Placeholder</p>
         <p id="phone">Phone: Placeholder</p>
         <p id="address">City: Placeholder</p>
+        <h2>Company Archive</h2>
+        <ul id="archive-list">
+        </ul>
         <button id="editButton">Edit</button>
         <Button id="closeAccount">Close account</Button>
         <button id="resetAPI">Reset API key</button>
       </div>
+    </section>
+    <section class="card full-height2">
+
     </section>
   </div>
 
@@ -360,7 +366,6 @@
 </main>
 </body>
 <script>
-
   if (localStorage.getItem('mode') === 'dark') {
     document.body.classList.add('dark-mode');
   }
@@ -404,8 +409,9 @@
   }
 
 
-  getUser();
-  getOrderHistory();
+    getUser();
+    getOrderHistory();
+    getArchive();
 
   function getOrderHistory() {
     fetch(`https://api.ardeco.app/order_history/user/${window.location.pathname.split('/').pop()}?mode=details`, {
@@ -433,6 +439,36 @@
           });
           orderList.appendChild(furnitureList);
           console.log(order);
+        });
+
+      } else {
+        alert('An error occurred while fetching user details');
+      }
+    }).catch(error => {
+      console.error(error);
+      alert('An error occurred while fetching user details' + error);
+    });
+  }
+
+  function getArchive() {
+    fetch(`https://api.ardeco.app/company/archive/${window.location.pathname.split('/').pop()}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+            .then(function (response) {
+              return response.json();
+            }).then(function (data) {
+      console.log(data);
+      if (data.status === 'OK') {
+        data.data.forEach(archive => {
+            const archiveList = document.getElementById('archive-list');
+            const archiveItem = document.createElement('li');
+            archiveItem.innerText = `Archive ID: ${archive.id} - Name: ${archive.name} - Price: ${archive.price} - Styles: ${archive.styles} - Rooms: ${archive.rooms} - Width: ${archive.width} - Height: ${archive.height} - Depth: ${archive.depth} - Colors: ${archive.colors}`;
+            archiveList.appendChild(archiveItem);
+            console.log(archive);
         });
 
       } else {

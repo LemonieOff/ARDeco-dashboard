@@ -350,6 +350,8 @@
                 <p id="phone">Phone: Placeholder</p>
                 <p id="address">City: Placeholder</p>
                 <button id="editButton">Edit</button>
+                <button id="changeRole">change role to company</button>
+                <button id="changeActiveSatatus">change active status</button>
             </div>
             <div>
                 Order List :
@@ -364,7 +366,7 @@
 </main>
 </body>
 <script>
-
+    var deleted = false;
     if (localStorage.getItem('mode') === 'dark') {
         document.body.classList.add('dark-mode');
     }
@@ -395,6 +397,7 @@
                 document.getElementById('firstname').innerText = data.data.firstname.toUpperCase();
                 document.getElementById('lastname').innerText = data.data.lastname.toUpperCase();
                 document.getElementById('role').innerText = data.data.role;
+                deleted = data.data.deleted;
                 document.getElementById('mail').innerText = "Mail : " + data.data.email;
                 document.getElementById('phone').innerText = "Phone : " + data.data.phone;
                 document.getElementById('address').innerText = "City : " + data.data.city;
@@ -543,6 +546,58 @@
         }).catch(error => {
             console.error(error);
             alert('An error occurred while updating user details' + error);
+        });
+    }
+
+    function changeRole() {
+        fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                role: 'company'
+            })
+        })
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                alert('User role updated successfully');
+            } else {
+                alert('An error occurred while updating user role');
+            }
+        }).catch(error => {
+            console.error(error);
+            alert('An error occurred while updating user role' + error);
+        });
+    }
+
+    function changeActiveStatus() {
+        fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                deleted: !deleted
+            })
+        })
+            .then(function (response) {
+                return response.json();
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                alert('User active status updated successfully');
+            } else {
+                alert('An error occurred while updating user active status');
+            }
+        }).catch(error => {
+            console.error(error);
+            alert('An error occurred while updating user active status' + error);
         });
     }
 

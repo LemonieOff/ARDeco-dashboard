@@ -399,13 +399,43 @@
       <button onclick="filterCatalog()">Appliquer les Filtres</button>
     </div>
   </div>
+  <div class="filter-popup" id="edit-popup">
+    <div class="filter-popup-content">
+      <span class="close" >&times;</span>
+      <h2>Edit Product</h2>
+      <form id="edit-form">
+        <label>
+          <input type="text" name="name" placeholder="Name">
+        </label>
+        <label>
+          <input type="text" name="price" placeholder="Price">
+        </label>
+        <label>
+          <input type="text" name="styles" placeholder="Styles">
+        </label>
+        <label>
+          <input type="text" name="rooms" placeholder="Rooms">
+        </label>
+        <label>
+          <input type="text" name="colors" placeholder="Colors">
+        </label>
+        <button type="button" onclick="sendEditedProduct()">Edit</button>
+      </form>
+    </div>
+  </div>
+
 
 </main>
 </body>
 <script>
   let filterPopup = document.getElementById("filter-popup");
+  let editPopup = document.getElementById("edit-popup");
   let btn = document.getElementById("filter-btn");
   let span = document.getElementsByClassName("close")[0];
+  let span2 = document.getElementsByClassName("close")[1];
+
+  let idEdit = 0;
+  let companyEdit = 0;
 
   if (localStorage.getItem('mode') === 'dark') {
     document.body.classList.add('dark-mode');
@@ -439,14 +469,14 @@
           const productDiv = document.createElement('li');
           productDiv.classList.add('product');
           productDiv.innerHTML = `
-          <p>${product.id}</p>
-          <p>${product.name}</p>
-          <p>${product.price}</p>
-          <p>${product.styles}</p>
-          <p>${product.rooms}</p>
-          <p>${product.colors}</p>
-          <p>${product.company_name}</p>
-            <button style="background-color: #1BCFC4; color: white;">Update</button>
+            <p>${product.id}</p>
+            <p>${product.name}</p>
+            <p>${product.price}</p>
+            <p>${product.styles}</p>
+            <p>${product.rooms}</p>
+            <p>${product.colors}</p>
+            <p>${product.company}: ${product.company_name}</p>
+            <button style="background-color: #1BCFC4; color: white;" onclick='openEditProduct(${product.id}, ${product.company}, "${product.name.replace(/"/g, "&quot;")}", ${product.price}, "${product.styles.replace(/"/g, "&quot;")}", "${product.rooms.replace(/"/g, "&quot;")}", "${product.colors.replace(/"/g, "&quot;")}")'>Edit</button>
             <button style="background-color: #FF4D4D; color: white;">Delete</button>
           `;
           catalog.appendChild(productDiv);
@@ -495,10 +525,67 @@
     filterPopup.style.display = "none";
   }
 
+    span2.onclick = function() {
+        editPopup.style.display = "none";
+    }
+
   window.onclick = function(event) {
     if (event.target === filterPopup) {
       filterPopup.style.display = "none";
     }
+  }
+
+  function openEditProduct(id, company, name, price, styles, rooms, colors) {
+    editPopup.style.display = "block";
+
+    document.getElementById('edit-form').elements.name.value = name;
+    document.getElementById('edit-form').elements.price.value = price;
+    document.getElementById('edit-form').elements.styles.value = styles;
+    document.getElementById('edit-form').elements.rooms.value = rooms;
+    document.getElementById('edit-form').elements.colors.value = colors;
+
+    idEdit = id;
+    companyEdit = company;
+  }
+
+  function sendEditedProduct() {
+    const name = document.getElementById('edit-form').elements.name.value;
+    const price = document.getElementById('edit-form').elements.price.value;
+    const styles = document.getElementById('edit-form').elements.styles.value;
+    const rooms = document.getElementById('edit-form').elements.rooms.value;
+    const colors = document.getElementById('edit-form').elements.colors.value;
+
+    fetch(`https://api.ardeco.app/catalog/{$companyEdit}/edit/${idEdit}`, {
+      method: 'PUT',
+      credentials: "include",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        price: price,
+        styles: styles,
+        rooms: rooms,
+        colors: colors
+      })
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      console.log(data);
+      if (data.status === 'OK') {
+        //close the popup
+        editPopup.style.display = "none";
+        //update the product in the catalog
+        const productDiv = document.getElementById('catalog').querySelector(`li:nth-child(${id})`);
+        productDiv.children[1].innerText = name;
+        productDiv.children[2].innerText = price;
+        productDiv.children[3].innerText = styles;
+        productDiv.children[4].innerText = rooms;
+        productDiv.children[5].innerText = colors;
+      }
+    }).catch(error => {
+      console.error(error);
+    });
   }
 </script>
 </html>

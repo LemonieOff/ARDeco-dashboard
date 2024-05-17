@@ -493,7 +493,20 @@
         }
     });
 
-    function makeFieldsEditable() {
+    document.getElementById('changeRole').addEventListener('click', function () {
+        changeRole();
+    });
+
+    document.getElementById('changeRole').addEventListener('click', function () {
+        changeRole();
+    });
+
+    document.getElementById('changeActiveSatatus').addEventListener('click', function () {
+        changeActiveStatus();
+    });
+
+
+        function makeFieldsEditable() {
         const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list
         fields.forEach(field => {
             const element = document.getElementById(field);

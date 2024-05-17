@@ -451,7 +451,7 @@
   }
 
   function getArchive() {
-    fetch(`https://api.ardeco.app/company/archive/${window.location.pathname.split('/').pop()}`, {
+    fetch(`https://api.ardeco.app/archive/${window.location.pathname.split('/').pop()}`, {
       method: 'GET',
       credentials: 'include',
       headers: {

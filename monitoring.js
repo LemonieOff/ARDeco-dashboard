@@ -42,6 +42,10 @@ app.get('/catalog', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/catalog.html'));
 });
 
+app.get('/changelog', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/changelog.html'));
+});
+
 
 
 const corsOptions = {

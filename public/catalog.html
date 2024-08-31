@@ -326,7 +326,25 @@
       margin-left: 67px;
     }
 
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
 
+    .checkbox-item {
+      background-color: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-item.selected {
+      background-color: #1BCFC4;
+      color: white;
+    }
 
   </style>
 </head>
@@ -411,24 +429,24 @@
   <div class="filter-popup" id="edit-popup">
     <div class="filter-popup-content">
       <span class="close" >&times;</span>
-      <h2>Edit Product</h2>
+      <h2>Modifier le produit</h2>
       <form id="edit-form">
-        <label>
-          <input type="text" name="name" placeholder="Name">
-        </label>
-        <label>
-          <input type="text" name="price" placeholder="Price">
-        </label>
-        <label>
-          <input type="text" name="styles" placeholder="Styles">
-        </label>
-        <label>
-          <input type="text" name="rooms" placeholder="Rooms">
-        </label>
-        <label>
-          <input type="text" name="colors" placeholder="Colors">
-        </label>
-        <button type="button" onclick="sendEditedProduct()">Edit</button>
+        <label for="edit-name">Nom :</label>
+        <input type="text" id="edit-name" name="name" placeholder="Nom">
+
+        <label for="edit-price">Prix :</label>
+        <input type="text" id="edit-price" name="price" placeholder="Prix">
+
+        <label>Styles :</label>
+        <div id="edit-styles" class="checkbox-group"></div>
+
+        <label>Pièces :</label>
+        <div id="edit-rooms" class="checkbox-group"></div>
+
+        <label>Couleurs :</label>
+        <div id="edit-colors" class="checkbox-group"></div>
+
+        <button type="button" onclick="sendEditedProduct()">Modifier</button>
       </form>
     </div>
   </div>
@@ -544,27 +562,64 @@
     }
   }
 
+  function fetchStyles() {
+    return ['Moderne', 'Classique', 'Industriel', 'Scandinave'];
+  }
+
+  function fetchRoomTypes() {
+    return ['Salon', 'Chambre', 'Cuisine', 'Salle de bain'];
+  }
+
+  function fetchColors() {
+    return ['Blanc', 'Noir', 'Gris', 'Beige', 'Bleu'];
+  }
+
+  function createCheckboxGroup(containerId, options) {
+    const container = document.getElementById(containerId);
+    options.forEach(option => {
+      const item = document.createElement('div');
+      item.classList.add('checkbox-item');
+      item.textContent = option;
+      item.onclick = function() {
+        this.classList.toggle('selected');
+      };
+      container.appendChild(item);
+    });
+  }
+
+  createCheckboxGroup('edit-styles', fetchStyles());
+  createCheckboxGroup('edit-rooms', fetchRoomTypes());
+  createCheckboxGroup('edit-colors', fetchColors());
+
   function openEditProduct(id, company, name, price, styles, rooms, colors) {
     editPopup.style.display = "block";
 
-    document.getElementById('edit-form').elements.name.value = name;
-    document.getElementById('edit-form').elements.price.value = price;
-    document.getElementById('edit-form').elements.styles.value = styles;
-    document.getElementById('edit-form').elements.rooms.value = rooms;
-    document.getElementById('edit-form').elements.colors.value = colors;
+    document.getElementById('edit-name').value = name;
+    document.getElementById('edit-price').value = price;
+
+    selectCheckboxItems('edit-styles', styles.split(',').map(s => s.trim()));
+    selectCheckboxItems('edit-rooms', rooms.split(',').map(r => r.trim()));
+    selectCheckboxItems('edit-colors', colors.split(',').map(c => c.trim()));
 
     idEdit = id;
     companyEdit = company;
   }
 
-  function sendEditedProduct() {
-    const name = document.getElementById('edit-form').elements.name.value;
-    const price = document.getElementById('edit-form').elements.price.value;
-    const styles = document.getElementById('edit-form').elements.styles.value;
-    const rooms = document.getElementById('edit-form').elements.rooms.value;
-    const colors = document.getElementById('edit-form').elements.colors.value;
+  function selectCheckboxItems(containerId, values) {
+    const container = document.getElementById(containerId);
+    container.querySelectorAll('.checkbox-item').forEach(item => {
+      item.classList.toggle('selected', values.includes(item.textContent));
+    });
+  }
 
-    fetch(`https://api.ardeco.app/catalog/{$companyEdit}/edit/${idEdit}`, {
+  function sendEditedProduct() {
+    const name = document.getElementById('edit-name').value;
+    const price = document.getElementById('edit-price').value;
+    const styles = getSelectedCheckboxValues('edit-styles');
+    const rooms = getSelectedCheckboxValues('edit-rooms');
+    const colors = getSelectedCheckboxValues('edit-colors');
+
+    fetch(`https://api.ardeco.app/catalog/${companyEdit}/edit/${idEdit}`, {
       method: 'PUT',
       credentials: "include",
       headers: {
@@ -573,28 +628,37 @@
       body: JSON.stringify({
         name: name,
         price: price,
-        styles: styles,
-        rooms: rooms,
-        colors: colors
+        styles: styles.join(','),
+        rooms: rooms.join(','),
+        colors: colors.join(',')
       })
     }).then(function (response) {
       return response.json();
     }).then(function (data) {
       console.log(data);
       if (data.status === 'OK') {
-        //close the popup
         editPopup.style.display = "none";
-        //update the product in the catalog
-        const productDiv = document.getElementById('catalog').querySelector(`li:nth-child(${id})`);
-        productDiv.children[1].innerText = name;
-        productDiv.children[2].innerText = price;
-        productDiv.children[3].innerText = styles;
-        productDiv.children[4].innerText = rooms;
-        productDiv.children[5].innerText = colors;
+        updateProductInCatalog(idEdit, name, price, styles, rooms, colors);
       }
     }).catch(error => {
       console.error(error);
     });
+  }
+
+  function getSelectedCheckboxValues(containerId) {
+    const container = document.getElementById(containerId);
+    return Array.from(container.querySelectorAll('.checkbox-item.selected')).map(item => item.textContent);
+  }
+
+  function updateProductInCatalog(id, name, price, styles, rooms, colors) {
+    const productDiv = document.querySelector(`#catalog li:nth-child(${id})`);
+    if (productDiv) {
+      productDiv.children[1].innerText = name;
+      productDiv.children[2].innerText = price;
+      productDiv.children[3].innerText = styles.join(',');
+      productDiv.children[4].innerText = rooms.join(',');
+      productDiv.children[5].innerText = colors.join(',');
+    }
   }
 </script>
 </html>

@@ -1,615 +1,417 @@
-
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARDeco Changelog</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-  <style>
-    ::-webkit-scrollbar {
-      width: 7px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: rgba(241, 241, 241, 0.0);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #6A7482;
-      border-radius: 5px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #58616c;
-    }
-
-
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #526ce3;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr 1.5fr;
-      grid-template-rows: auto auto;
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .card {
-      background-color: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .full-height {
-      grid-row: 1 / -1;
-    }
-
-    main > :nth-child(4) {
-      grid-column: 2 / span 2;
-      grid-row: 2;
-    }
-
-    .full-height {
-      height: 90vh;
-      width: 45vh;
-    }
-
-    .full-height2 {
-      grid-row: 1 / -1;
-    }
-
-    .full-height2 {
-      height: 90.5vh;
-      width: 70vw;
-    }
-
-    #open-tickets-list li:last-child {
-      border-bottom: none;
-    }
-
-    #categories {
-      padding: 0;
-      list-style-type: none;
-      margin: 20px;
-    }
-
-    #categories li {
-      margin-bottom: 15px;
-      padding: 10px 15px;
-      color: #6A7482;
-      font-weight: bold;
-    }
-
-    #categories li.selected {
-      background: #ECFFFE;
-      color: #6A7482;
-      box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
-    }
-
-    a {
-      text-decoration: none;
-      color: #6A7482;
-    }
-
-    .message {
-      max-width: 50%;
-      word-wrap: break-word;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 10px;
-      background: #e1e9f5;
-      color: #6A7482;
-      width: 50%;
-    }
-
-
-    #userCard {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .text-height {
-      height: 6vh;
-    }
-
-    ul {
-      list-style-type: none;
-    }
-
-    .text-input-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-    }
-
-    #answer {
-      flex-grow: 1;
-      padding: 10px;
-      margin-right: 10px;
-      border: none;
-      border-bottom: 1px solid #ccc;
-      outline: none;
-    }
-
-    .dark-mode #answer {
-      background: #1F2734;
-      color: white;
-    }
-
-    #answer:focus {
-      border-color: #1BCFC4;
-    }
-
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-
-    #sendButton {
-      background-color: #FE9496;
-      color: white;
-      margin-right: 2%;
-    }
-
-    #sendButton:hover {
-      background-color: #ea7e82;
-    }
-
-    #closeButton {
-      background-color: #1BCFC4;
-      color: white;
-      margin-right: 1%;
-    }
-
-    #deleteButton {
-      background: #9E58FF;
-      color: white;
-    }
-
-    #closeButton:hover {
-      background-color: #15a29a;
-    }
-
-    #deleteButton:hover {
-      background: #4d2c7c;
-    }
-
-
-    #messages-list {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      overflow: auto;
-      max-height: 80%;
-      padding: 10px;
-    }
-
-    .right {
-      align-self: flex-end;
-      background: #1BCFC4;
-      color: white;
-    }
-
-    .line {
-      width: 100%;
-      height: 1px;
-      background: #e1e9f5;
-      margin: 20px 0;
-    }
-
-    #theme-toggle {
-      background-color: #fff;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .dark-mode {
-      background: #18202D;
-      color: white;
-    }
-
-    .light-mode {
-      background-color: #f5f5f5;
-      color: black;
-    }
-
-    .dark-mode .card {
-      background-color: #1F2734;
-    }
-
-    .light-mode .card {
-      background-color: white;
-    }
-
-    .dark-mode #categories li.selected {
-      background-color: #18202D;
-      color: white;
-      box-shadow: none;
-    }
-
-    .dark-mode #open-tickets-list li {
-      background-color: #18202D;
-      box-shadow: none;
-    }
-
-    .dark-mode #open-tickets-list li a {
-      color: white;
-    }
-
-    .icon {
-      color: #1BCFC4;
-      background: #ffffff;
-    }
-
-    .iselected {
-      color: #ffffff;
-      background: #1BCFC4;
-    }
-
-    .dark-mode .icon {
-      color: #1F2734;
-      background: #1BCFC4;
-    }
-
-    #mode-toggle {
-      margin-top: 20%;
-      margin-left: 32%;
-      background-color: #9E58FF;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-
-    #mode-toggle:hover {
-      background-color: #4d2c7c;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      box-sizing: border-box;
-    }
-
-    .suggestions-container {
-      padding: 20px;
-    }
-
-    .suggestion-item {
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-
-    .suggestion-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background-color: #f5f5f5;
-      cursor: pointer;
-    }
-
-    .suggestion-button {
-      margin-right: 10px;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-    }
-
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .process-button {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .process-button:hover {
-      background-color: #45a049;
-    }
-
-    .process-button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARDeco Suggestions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1BCFC4;
+            --secondary-color: #526ce3;
+            --text-color: #6A7482;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            width: 250px;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+        }
+
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        #mode-toggle {
+            margin-top: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dark-mode {
+            --bg-color: #18202D;
+            --card-bg: #1F2734;
+            --text-color: white;
+            --primary-color: #2C3E50;
+        }
+
+        .suggestions-container {
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .suggestion-title {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .suggestion-date {
+            font-size: 0.8em;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .suggestion-content {
+            padding-top: 10px;
+            display: none;
+        }
+
+        .suggestion-content.expanded {
+            display: block;
+        }
+
+        .suggestion-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .suggestion-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid var(--text-color);
+            width: 80%;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: var(--text-color);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                z-index: 1000;
+                width: 100%;
+                background-color: transparent;
+            }
+
+            .sidebar.active {
+                left: 0;
+                background-color: var(--primary-color);
+            }
+
+            #menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+            }
+
+            .main-content {
+                margin-top: 50px;
+            }
+        }
+    </style>
 </head>
 <body>
-<main>
-  <section class="card full-height">
-    <h2>ARDeco Administration tool</h2>
-    <div class="line"></div>
-    <ul id="categories">
-      <li><a href="/dashboard"><i class="fa-solid fa-ticket icon"
-                                  style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
-        Tickets
-      </a></li>
-      <li><a href="/users"><i class="fa-solid fa-user icon"
-                                               style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
-        User</a></li>
-      <li><a href="/catalog"><i class="fa-solid fa-book icon"
-             style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Catalog
-      </a></li>
-      <li><i class="fa-solid fa-chart-simple icon"
-             style="border-radius: 9px; padding: 10px;margin-right: 3px;"></i> Statistics
-      </li>
-      <li><a href="/changelog"><i class="fa-solid fa-clipboard-list icon"
-             style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
-        Changelog
-      </a></li>
-      <li class="selected"><a href="/suggestions"><i class="fa-solid fa-list-ul icon iselected"
-                                  style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
-        Suggestions
-      </a></li>
-    </ul>
-    <div class="line"></div>
-    <div style="background: #1BCFC4; height: 20%; width: 80%; border-radius: 15px; color: white; padding: 10%">
-      <h1>New categories may arrive in a future update of the admin dashboard</h1>
+    <button id="menu-toggle"><i class="fas fa-bars"></i></button>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>ARDeco Administration</h2>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard" id="dashboard-link"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="/users" id="users-link"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                    <li><a href="/catalog" id="catalog-link"><i class="fas fa-book"></i> Catalogue</a></li>
+                    <li><a href="/statistics" id="statistics-link"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                    <li><a href="/changelog" id="changelog-link"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                    <li><a href="/suggestions" id="suggestions-link"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                </ul>
+            </nav>
+            <button id="mode-toggle">Changer de thème</button>
+        </aside>
+
+        <main class="main-content">
+            <section class="card">
+                <h2>Suggestions</h2>
+                <div class="suggestions-container">
+                    <div id="suggestionsList"></div>
+                </div>
+            </section>
+        </main>
     </div>
-    <button id="mode-toggle">Theme switch</button>
-  </section>
 
-  <section class="card full-height2">
-    <h2>Suggestions</h2>
-    <div class="suggestions-container">
-      <div id="suggestionsList"></div>
-    </div>
-  </section>
-</main>
-
-
-<div id="suggestionModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2 id="modalTitle">Détails de la suggestion</h2>
-    <div id="suggestionDetails"></div>
-  </div>
-</div>
-
-<script>
-  let suggestions = [];
-
-  function fetchSuggestions() {
-    fetch(`https://api.ardeco.app/feedbacks`, {
-      method: 'GET',
-      credentials: "include",
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === "OK" && data.code === 200) {
-          suggestions = data.data.filter(item => item.type === "suggestion" && !item.processed);
-          console.log("Suggestions récupérées:", suggestions);
-          renderSuggestions();
-        } else {
-          console.error('Erreur lors de la récupération des suggestions:', data.description);
-        }
-      })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des suggestions:', error);
-      });
-  }
-
-  function renderSuggestions() {
-    const suggestionsList = document.getElementById('suggestionsList');
-    suggestionsList.innerHTML = '';
-    suggestions.forEach(suggestion => {
-      const suggestionItem = document.createElement('div');
-      suggestionItem.className = 'suggestion-item';
-      suggestionItem.innerHTML = `
-        <div class="suggestion-header">
-          <span>ID: ${suggestion.id} | Utilisateur: ${suggestion.user_id}</span>
-          <p>${suggestion.feedback.substring(0, 50)}...</p>
-          <button onclick="showSuggestionDetails(${suggestion.id})" class="suggestion-button">Détail</button>
+    <div id="suggestionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Détails de la suggestion</h2>
+            <div id="suggestionDetails"></div>
         </div>
-      `;
-      suggestionsList.appendChild(suggestionItem);
-    });
-  }
+    </div>
 
-  function showSuggestionDetails(id) {
-    console.log("Affichage des détails pour la suggestion ID:", id);
-    const suggestion = suggestions.find(s => s.id === id);
-    if (suggestion) {
-      console.log("Suggestion trouvée:", suggestion);
-      const detailsContainer = document.getElementById('suggestionDetails');
-      detailsContainer.innerHTML = `
-        <p><strong>ID:</strong> ${suggestion.id}</p>
-        <p><strong>ID Utilisateur:</strong> ${suggestion.user_id}</p>
-        <p><strong>Suggestion:</strong> ${suggestion.feedback}</p>
-        <p><strong>Date de création:</strong> ${new Date(suggestion.date).toLocaleString()}</p>
-        <p><strong>Traité:</strong> ${suggestion.processed ? 'Oui' : 'Non'}</p>
-        <button onclick="processSuggestion(${suggestion.id})" class="process-button" ${suggestion.processed ? 'disabled' : ''}>
-          ${suggestion.processed ? 'Déjà traité' : 'Traiter la suggestion'}
-        </button>
-      `;
-      const modal = document.getElementById('suggestionModal');
-      modal.style.display = 'block';
-      console.log("Modal affiché");
-    } else {
-      console.error("Suggestion non trouvée pour l'ID:", id);
-    }
-  }
+    <script>
+        let suggestions = [];
 
-  function processSuggestion(id) {
-    fetch(`https://api.ardeco.app/feedbacks/process/${id}`, {
-      method: 'PUT',
-      credentials: "include",
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === "OK") {
-        alert('Suggestion traitée avec succès');
-        fetchSuggestions();
-        closeModal();
-      } else {
-        alert('Erreur lors du traitement de la suggestion');
-      }
-    })
-    .catch(error => {
-      console.error('Erreur lors du traitement de la suggestion:', error);
-      alert('Erreur lors du traitement de la suggestion');
-    });
-  }
-
-  function closeModal() {
-    document.getElementById('suggestionModal').style.display = 'none';
-    console.log("Modal fermé");
-  }
-
-  document.querySelector('.close').addEventListener('click', closeModal);
-  window.onclick = function(event) {
-    if (event.target == document.getElementById('suggestionModal')) {
-      closeModal();
-    }
-  }
-
-  fetchSuggestions();
-</script>
-</body>
-</html>
-
-<script>
-  if (localStorage.getItem('mode') === 'dark') {
-    document.body.classList.add('dark-mode');
-  }
-
-  document.getElementById('mode-toggle').addEventListener('click', function () {
-    document.body.classList.toggle('dark-mode');
-    if (document.body.classList.contains('dark-mode')) {
-      localStorage.setItem('mode', 'dark');
-    } else {
-      localStorage.setItem('mode', 'light');
-    }
-  });
-
-  function getUser() {
-    getUserRole();
-    fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-            .then(function (response) {
-              return response.json();
-            }).then(function (data) {
-      console.log(data);
-      if (data.status === 'OK') {
-        document.getElementById('firstname').innerText = data.data.firstname.toUpperCase();
-        document.getElementById('lastname').innerText = data.data.lastname.toUpperCase();
-        document.getElementById('role').innerText = data.data.role;
-        document.getElementById('mail').innerText = "Mail : " + data.data.email;
-        document.getElementById('phone').innerText = "Phone : " + data.data.phone;
-        document.getElementById('address').innerText = "City : " + data.data.city;
-      } else {
-        alert('An error occurred while fetching user details');
-      }
-    }).catch(error => {
-      console.error(error);
-      alert('An error occurred while fetching user details' + error);
-    });
-  }
-
-
-
-  function getUserRole() {
-    if (localStorage.getItem("uid")) {
-      fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
-        method: 'GET',
-        credentials: "include",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-      })
-              .then(function (response) {
-                return response.json();
-              }).then(function (data) {
-        console.log(data);
-        if (data.status === 'OK') {
-          if (data.data.role === 'admin') {
-            console.log('Admin');
-          } else {
-            window.location = "/";
-            console.log('Login as admin to access dashboard');
-          }
+        function fetchSuggestions() {
+            fetch(`https://api.ardeco.app/feedbacks`, {
+                method: 'GET',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "OK" && data.code === 200) {
+                    suggestions = data.data.filter(item => item.type === "suggestion" && !item.processed);
+                    console.log("Suggestions récupérées:", suggestions);
+                    renderSuggestions();
+                } else {
+                    console.error('Erreur lors de la récupération des suggestions:', data.description);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des suggestions:', error);
+            });
         }
-      }).catch(error => {
-        window.location = "/";
-        console.error(error);
-      });
-    } else {
-      window.location = "/";
-    }
-  }
 
+        function renderSuggestions() {
+            const suggestionsList = document.getElementById('suggestionsList');
+            suggestionsList.innerHTML = '';
+            suggestions.forEach(suggestion => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'suggestion-item';
+                const date = new Date(suggestion.date).toLocaleDateString('fr-FR');
+                suggestionItem.innerHTML = `
+                    <div class="suggestion-header" onclick="toggleSuggestion(${suggestion.id})">
+                        <span class="suggestion-title">ID: ${suggestion.id} | Utilisateur: ${suggestion.user_id}</span>
+                        <span class="suggestion-date">${date}</span>
+                    </div>
+                    <div id="content-${suggestion.id}" class="suggestion-content">
+                        <p>${suggestion.feedback}</p>
+                        <button onclick="showSuggestionDetails(${suggestion.id})" class="suggestion-button">Détail</button>
+                    </div>
+                `;
+                suggestionsList.appendChild(suggestionItem);
+            });
+        }
 
-</script>
+        function toggleSuggestion(id) {
+            const content = document.getElementById(`content-${id}`);
+            content.classList.toggle('expanded');
+        }
+
+        function showSuggestionDetails(id) {
+            console.log("Affichage des détails pour la suggestion ID:", id);
+            const suggestion = suggestions.find(s => s.id === id);
+            if (suggestion) {
+                console.log("Suggestion trouvée:", suggestion);
+                const detailsContainer = document.getElementById('suggestionDetails');
+                detailsContainer.innerHTML = `
+                    <p><strong>ID:</strong> ${suggestion.id}</p>
+                    <p><strong>ID Utilisateur:</strong> ${suggestion.user_id}</p>
+                    <p><strong>Suggestion:</strong> ${suggestion.feedback}</p>
+                    <p><strong>Date de création:</strong> ${new Date(suggestion.date).toLocaleString()}</p>
+                    <p><strong>Traité:</strong> ${suggestion.processed ? 'Oui' : 'Non'}</p>
+                    <button onclick="processSuggestion(${suggestion.id})" class="suggestion-button" ${suggestion.processed ? 'disabled' : ''}>
+                        ${suggestion.processed ? 'Déjà traité' : 'Traiter la suggestion'}
+                    </button>
+                `;
+                const modal = document.getElementById('suggestionModal');
+                modal.style.display = 'block';
+                console.log("Modal affiché");
+            } else {
+                console.error("Suggestion non trouvée pour l'ID:", id);
+            }
+        }
+
+        function processSuggestion(id) {
+            fetch(`https://api.ardeco.app/feedbacks/process/${id}`, {
+                method: 'PUT',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "OK") {
+                    alert('Suggestion traitée avec succès');
+                    fetchSuggestions();
+                    closeModal();
+                } else {
+                    alert('Erreur lors du traitement de la suggestion');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors du traitement de la suggestion:', error);
+                alert('Erreur lors du traitement de la suggestion');
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('suggestionModal').style.display = 'none';
+            console.log("Modal fermé");
+        }
+
+        document.querySelector('.close').addEventListener('click', closeModal);
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('suggestionModal')) {
+                closeModal();
+            }
+        }
+
+        function setActiveTab() {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveTab();
+            fetchSuggestions();
+        });
+
+        if (localStorage.getItem('mode') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        document.getElementById('mode-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>

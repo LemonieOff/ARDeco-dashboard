@@ -1,438 +1,375 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-    <meta charSet="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Support Dashboard</title>
+    <title>Tableau de bord ARDeco</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <style>
-
-        ::-webkit-scrollbar {
-            width: 7px;
+        :root {
+            --primary-color: #1BCFC4;
+            --secondary-color: #526ce3;
+            --text-color: #6A7482;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(241, 241, 241, 0.0);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #6A7482;
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #58616c;
-        }
-
-        li {
-            border-radius: 5px;
-        }
-
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
             margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            width: 250px;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
             padding: 0;
         }
 
-        header {
-            background-color: #526ce3;
-            color: white;
-            padding: 20px;
-            text-align: center;
+        .sidebar li {
+            margin-bottom: 15px;
         }
 
-        main {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1.5fr;
-            grid-template-rows: auto auto;
-            gap: 20px;
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            flex-grow: 1;
             padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
         .card {
-            background-color: white;
+            background-color: var(--card-bg);
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            height: 45vh;
+            box-shadow: var(--shadow);
         }
 
-        .full-height {
-            grid-row: 1 / -1;
-        }
-
-        main > :nth-child(4) {
-            grid-column: 2 / span 2;
-            grid-row: 2;
-        }
-
-        .full-height {
-            height: 90.5vh;
-            width: 45vh;
-        }
-
-        .full-width {
-            height: 39vh;
-            width: 142vh;
-        }
-
-        #open-tickets-list {
-            width: auto;
-            height: 370px;
-            overflow: auto;
-            list-style-type: none;
-            padding: 0;
-        }
-
-        #open-tickets-list li {
-            background-color: #ECFFFE;
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-weight: bold;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
-        }
-
-        #open-tickets-list li:last-child {
-            border-bottom: none;
-        }
-
-        #open-tickets-list li a {
-            text-decoration: none;
-            color: #6A7482;
-            font-size: 16px;
-            flex-grow: 1;
-        }
-
-        #open-tickets-list li a:hover {
-
-        }
-
-        #priority-chart {
-            margin: auto;
-            height: 400px;
-            width: 400px;
-        }
-
-        #week-chart {
-            display: flex;
-            height: 200px;
-            width: 650px;
-        }
-
-        #categories {
-            padding: 0;
-            list-style-type: none;
-            margin: 20px;
-        }
-
-        #categories li {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            color: #6A7482;
-            font-weight: bold;
-        }
-
-        #categories li.selected {
-            background: #ECFFFE;
-            color: #6A7482;
-            box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
-        }
-
-        a {
-            text-decoration: none;
-            color: #6A7482;
-        }
-
-        .graph {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .stats-week {
-            margin-left: 100px;
-            display: flex;
-            flex-direction: column;
-            color: #6A7482;
-        }
-
-        .dark-mode .stats-week {
+        #mode-toggle {
+            margin-top: 20px;
+            background-color: var(--secondary-color);
             color: white;
-        }
-
-        h4 {
-            margin-bottom: 3px;
-        }
-
-        .line {
-            width: 100%;
-            height: 1px;
-            background: #e1e9f5;
-            margin: 20px 0;
-        }
-
-        #theme-toggle {
-            background-color: #fff;
-            color: #000;
             border: none;
-            padding: 10px 20px;
+            padding: 10px;
             border-radius: 5px;
             cursor: pointer;
         }
 
         .dark-mode {
-            background: #18202D;
-            color: white;
+            --bg-color: #18202D;
+            --card-bg: #1F2734;
+            --text-color: white;
+            --primary-color: #2C3E50;
         }
 
-        .light-mode {
-            background-color: #f5f5f5;
-            color: black;
+        #open-tickets-list {
+            list-style-type: none;
+            padding: 0;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        .dark-mode .card {
-            background-color: #1F2734;
+        #open-tickets-list li {
+            background-color: var(--card-bg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
-        .light-mode .card {
-            background-color: white;
+        #open-tickets-list li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .dark-mode #categories li.selected {
-            background-color: #18202D;
-            color: white;
-            box-shadow: none;
+        #open-tickets-list a {
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticket-title {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .ticket-date {
+            font-size: 0.8em;
+            color: var(--text-color);
+            opacity: 0.7;
         }
 
         .dark-mode #open-tickets-list li {
-            background-color: #18202D;
-            box-shadow: none;
+            background-color: #2C3E50;
         }
 
-        .dark-mode #open-tickets-list li a {
-            color: white;
+        #open-tickets-list::-webkit-scrollbar {
+            width: 8px;
         }
 
-        button {
-            margin-top: 20%;
-            margin-left: 32%;
-            background-color: #9E58FF;
-            color: white;
+        #open-tickets-list::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        #open-tickets-list::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        #open-tickets-list::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        #menu-toggle {
+            display: none;
+            background: none;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            color: var(--primary-color);
+            font-size: 24px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            z-index: 1001;
         }
 
-        button:hover {
-            background-color: #4d2c7c;
-        }
-
-        .icon {
-            color: #1BCFC4;
-            background: #ffffff;
-        }
-
-        .iselected {
-            color: #ffffff;
-            background: #1BCFC4;
-        }
-
-        .dark-mode .icon {
-            color: #1F2734;
-            background: #1BCFC4;
-        }
-
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-<main>
-    <section class="card full-height">
-        <h2>ARDeco Administration tool</h2>
-        <div class="line"></div>
-        <ul id="categories">
-            <li class="selected"><i class="fa-solid fa-ticket icon iselected"
-                                        style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Tickets
-            </li>
-            <li><a href="/users"><i class="fa-solid fa-user icon"
-                                    style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> User</a></li>
-            <li><a href="/catalog"></a><i class="fa-solid fa-book icon" style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i>
-                Catalog
-            </a></li>
-            <li><a href="/statistics"><i class="fa-solid fa-chart-simple icon"
-                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Statistics</a>
-            </li>
-            <li><a href="/changelog"><i class="fa-solid fa-clipboard-list icon"
-                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Changelog</a>
-            </li>
-            <li><a href="/suggestions"><i class="fa-solid fa-list-ul icon"
-                   style="border-radius: 9px; padding: 10px; margin-right: 3px;"></i> Suggestions</a>
-            </li>
-        </ul>
-        <div class="line"></div>
-        <div style="background: #1BCFC4; height: 20%; width: 80%; border-radius: 15px; color: white; padding: 10%">
-            <h1>New categories may arrive in a future update of the admin dashboard</h1>
-        </div>
-        <button id="mode-toggle">Theme switch</button>
-
-    </section>
-    <section class="card">
-        <h2>Global tickets status</h2>
-        <canvas id="priority-chart"></canvas>
-    </section>
-    <section class="card">
-        <h2>Pending tickets</h2>
-        <ul id="open-tickets-list"></ul>
-    </section>
-    <section class="card full-width">
-        <h2>Tickets of the Week</h2>
-        <section class="graph">
-            <canvas id="week-chart"></canvas>
-            <div class="stats-week">
-                <h4 id="0d">Today </h4>
-                <h4 id="1d">Yesterday </h4>
-                <h4 id="2d">2 days ago </h4>
-                <h4 id="3d">3 days ago </h4>
-                <h4 id="4d">4 days ago </h4>
-                <h4 id="5d">5 days ago </h4>
-                <h4 id="6d">6 days ago </h4>
-            </div>
-        </section>
-    </section>
-</main>
-</body>
-<script>
-
-    let weekChart;
-
-    if (localStorage.getItem('mode') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-
-    document.getElementById('mode-toggle').addEventListener('click', function () {
-        document.body.classList.toggle('dark-mode');
-        if (document.body.classList.contains('dark-mode')) {
-            localStorage.setItem('mode', 'dark');
-        } else {
-            localStorage.setItem('mode', 'light');
-        }
-        updateWeekChartGradient();
-    });
-
-    const priorityChartCtx = document.getElementById('priority-chart').getContext('2d');
-    const weekChartCtx = document.getElementById('week-chart').getContext('2d');
-
-    let openTickets = 0;
-    let closedTickets = 0;
-    let deletedTickets = 0;
-    getUserRole();
-    fetch('https://api.ardeco.app/ticket/stats', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            openTickets = data.data.pending;
-            closedTickets = data.data.closed;
-            deletedTickets = data.data.deleted;
-            const priorityChart = new Chart(priorityChartCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['pending', 'closed', 'deleted'],
-                        datasets: [{
-                            data: [openTickets, closedTickets, deletedTickets],
-                            backgroundColor: ['#FE9496', '#1BCFC4', '#9E58FF'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    boxWidth: 20,
-                                    font: {
-                                        size: 20
-                                    }
-                                }
-                            }
-                        },
-                        responsive: false,
-                        maintainAspectRatio: false,
-                        cutout: '70%'
-                    }
-                }
-            );
-        })
-        .catch(error => {
-            console.error('Erreur lors de la récupération des tickets:', error);
-            console.log(document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]);
-        });
-
-
-    fetch('https://api.ardeco.app/ticket/stats/last7days', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => response.json())
-        .then(data => {
-            let today = data.data.days.today;
-            let yesterday = data.data.days.yesterday;
-            let twoDaysAgo = data.data.days.twoDaysAgo;
-            let threeDaysAgo = data.data.days.threeDaysAgo;
-            let fourDaysAgo = data.data.days.fourDaysAgo;
-            let fiveDaysAgo = data.data.days.fiveDaysAgo;
-            let sixDaysAgo = data.data.days.sixDaysAgo;
-
-            document.getElementById('6d').innerText += ' ' + sixDaysAgo + " tickets were created";
-            document.getElementById('5d').innerText += ' ' + fiveDaysAgo + " tickets were created";
-            document.getElementById('4d').innerText += ' ' + fourDaysAgo + " tickets were created";
-            document.getElementById('3d').innerText += ' ' + threeDaysAgo + " tickets were created";
-            document.getElementById('2d').innerText += ' ' + twoDaysAgo + " tickets were created";
-            document.getElementById('1d').innerText += ' ' + yesterday + " tickets were created";
-            document.getElementById('0d').innerText += ' ' + today + " tickets were created";
-
-            const gradient = weekChartCtx.createLinearGradient(0, 0, 0, 400);
-            let border;
-            if (localStorage.getItem('mode') === 'dark') {
-                gradient.addColorStop(0, 'rgba(158,88,255,0.88)');
-                gradient.addColorStop(1, '#4d2c7c');
-                border = '#9E58FF';
-            } else {
-                gradient.addColorStop(0, '#ffbdc0');
-                gradient.addColorStop(1, '#FFFFFF');
-                border = '#FE9496';
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
             }
 
-            weekChart = new Chart(weekChartCtx, {
-                type: 'line',
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                z-index: 1000;
+                width: 100%;
+                background-color: transparent;
+            }
+
+            .sidebar.active {
+                left: 0;
+                background-color: var(--primary-color);
+            }
+
+            #menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+            }
+
+            .main-content {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="menu-toggle"><i class="fas fa-bars"></i></button>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>ARDeco Administration</h2>
+            <nav>
+                <ul>
+                    <li><a href="#"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                    <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
+                    <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                    <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                    <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                </ul>
+            </nav>
+            <button id="mode-toggle">Changer de thème</button>
+        </aside>
+
+        <main class="main-content">
+            <section class="card">
+                <h2>Statut global des tickets</h2>
+                <canvas id="priority-chart"></canvas>
+            </section>
+
+            <section class="card">
+                <h2>Tickets en attente</h2>
+                <ul id="open-tickets-list"></ul>
+            </section>
+
+            <section class="card">
+                <h2>Tickets de la semaine</h2>
+                <canvas id="week-chart"></canvas>
+                <div id="week-stats"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let weekChart;
+
+        if (localStorage.getItem('mode') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        document.getElementById('mode-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            updateWeekChartGradient();
+        });
+
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+            if (sidebar.classList.contains('active')) {
+                sidebar.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
+            } else {
+                setTimeout(() => {
+                    sidebar.style.backgroundColor = 'transparent';
+                }, 300);
+            }
+        });
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            window.location = "/";
+                        }
+                    }
+                })
+                .catch(error => {
+                    window.location = "/";
+                    console.error(error);
+                });
+            } else {
+                window.location = "/";
+            }
+        }
+
+        function fetchTicketStats() {
+            fetch('https://api.ardeco.app/ticket/stats', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const { pending, closed, deleted } = data.data;
+                createPriorityChart(pending, closed, deleted);
+            })
+            .catch(error => console.error('Erreur lors de la récupération des statistiques:', error));
+        }
+
+        function createPriorityChart(pending, closed, deleted) {
+            const ctx = document.getElementById('priority-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
                 data: {
-                    labels: ['6 days ago', '5 days ago', '4 days ago', '3 days ago', '2 days ago', 'yesterday', 'today'],
+                    labels: ['En attente', 'Fermés', 'Supprimés'],
                     datasets: [{
-                        label: 'Tickets created this day',
-                        fill: true,
-                        data: [sixDaysAgo, fiveDaysAgo, fourDaysAgo, threeDaysAgo, twoDaysAgo, yesterday, today],
-                        backgroundColor: gradient,
-                        borderColor: border,
-                        borderWidth: 1,
-                        tension: 0.3,
-                        pointRadius: 1,
+                        data: [pending, closed, deleted],
+                        backgroundColor: ['#FE9496', '#1BCFC4', '#9E58FF'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
-                    responsive: false,
-                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: {
+                                    size: 14
+                                },
+                                padding: 20
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function fetchWeeklyStats() {
+            fetch('https://api.ardeco.app/ticket/stats/last7days', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const weekData = Object.values(data.data.days).reverse();
+                createWeekChart(weekData);
+                updateWeekStats(data.data.days);
+            })
+            .catch(error => console.error('Erreur lors de la récupération des statistiques hebdomadaires:', error));
+        }
+
+        function createWeekChart(data) {
+            const ctx = document.getElementById('week-chart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(158,88,255,0.88)');
+            gradient.addColorStop(1, 'rgba(158,88,255,0.2)');
+
+            weekChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['6 jours', '5 jours', '4 jours', '3 jours', '2 jours', 'Hier', 'Aujourd\'hui'],
+                    datasets: [{
+                        label: 'Tickets créés',
+                        data: data,
+                        fill: true,
+                        backgroundColor: gradient,
+                        borderColor: '#9E58FF',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
                     plugins: {
                         legend: {
                             display: false
@@ -440,95 +377,62 @@
                     },
                     scales: {
                         y: {
-                            grid: {
-                                display: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
+                            beginAtZero: true
                         }
                     }
                 }
-            })
-        })
-
-    function updateWeekChartGradient() {
-        let gradient;
-        let border;
-        let labelColors;
-        if (document.body.classList.contains('dark-mode')) {
-            gradient = weekChartCtx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(158,88,255,0.88)');
-            gradient.addColorStop(1, '#4d2c7c');
-            border = '#9E58FF';
-            labelColors = '#FFFFFF';
-        } else {
-            gradient = weekChartCtx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, '#ffbdc0');
-            gradient.addColorStop(1, '#FFFFFF');
-            border = '#FE9496';
-            labelColors = '#6A7482';
+            });
         }
-        weekChart.data.datasets[0].backgroundColor = gradient;
-        weekChart.data.datasets[0].borderColor = border;
-        weekChart.options.plugins.legend.labels.color = labelColors;
-        weekChart.update();
-    }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        getUserRole();
-        fetch('https://api.ardeco.app/ticket/pending', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        function updateWeekStats(days) {
+            const statsContainer = document.getElementById('week-stats');
+            statsContainer.innerHTML = Object.entries(days).map(([key, value]) => 
+                `<p>${key}: ${value} tickets créés</p>`
+            ).join('');
+        }
+
+        function fetchPendingTickets() {
+            fetch('https://api.ardeco.app/ticket/pending', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            })
             .then(response => response.json())
             .then(data => {
                 const ticketsList = document.getElementById('open-tickets-list');
-
-                data.data.forEach(ticket => {
-                    const ticketElement = document.createElement('li');
-                    ticketElement.innerHTML = `<a href="/ticket/${ticket.id}" class="title"><h>${ticket.title}</h><p class="description">${ticket.description}</p></a>`;
-                    ticketsList.appendChild(ticketElement);
-                });
+                ticketsList.innerHTML = data.data.map(ticket => {
+                    const date = new Date(ticket.date);
+                    const formattedDate = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    return `<li>
+                        <a href="/ticket/${ticket.id}">
+                            <span class="ticket-title">${ticket.title}</span>
+                            <span class="ticket-date">${formattedDate}</span>
+                        </a>
+                    </li>`;
+                }).join('');
             })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des tickets:', error);
-            });
-    });
-
-    function getUserRole() {
-        if (localStorage.getItem("uid")) {
-            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
-                method: 'GET',
-                credentials: "include",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-                .then(function (response) {
-                    return response.json();
-                }).then(function (data) {
-                console.log(data);
-                if (data.status === 'OK') {
-                    if (data.data.role === 'admin') {
-                        console.log('Admin');
-                    } else {
-                        window.location = "/";
-                        console.log('Login as admin to access dashboard');
-                    }
-                }
-            }).catch(error => {
-                window.location = "/";
-                console.error(error);
-            });
-        } else {
-            window.location = "/";
+            .catch(error => console.error('Erreur lors de la récupération des tickets en attente:', error));
         }
-    }
-</script>
+
+        function updateWeekChartGradient() {
+            const gradient = weekChart.ctx.createLinearGradient(0, 0, 0, 400);
+            if (document.body.classList.contains('dark-mode')) {
+                gradient.addColorStop(0, 'rgba(158,88,255,0.88)');
+                gradient.addColorStop(1, 'rgba(158,88,255,0.2)');
+            } else {
+                gradient.addColorStop(0, 'rgba(254,148,150,0.88)');
+                gradient.addColorStop(1, 'rgba(254,148,150,0.2)');
+            }
+            weekChart.data.datasets[0].backgroundColor = gradient;
+            weekChart.update();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            getUserRole();
+            fetchTicketStats();
+            fetchWeeklyStats();
+            fetchPendingTickets();
+        });
+    </script>
+</body>
 </html>

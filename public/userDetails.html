@@ -310,6 +310,32 @@
             box-sizing: border-box;
         }
 
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            flex: 1 0 calc(50% - 5px);
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            color: white;
+        }
+
+        #editButton { background-color: #1BCFC4; }
+        #changeRoleCompany { background-color: #FE9496; }
+        #changeRolePro { background-color: #9E58FF; }
+        #changeActiveStatus { background-color: #526ce3; }
+
+        .action-button:hover {
+            opacity: 0.8;
+        }
 
     </style>
 </head>
@@ -340,9 +366,6 @@
             </li>
         </ul>
         <div class="line"></div>
-        <div style="background: #1BCFC4; height: 20%; width: 80%; border-radius: 15px; color: white; padding: 10%">
-            <h1>New categories may arrive in a future update of the admin dashboard</h1>
-        </div>
         <button id="mode-toggle">Theme switch</button>
     </section>
     <div id="userCard">
@@ -355,9 +378,12 @@
                 <p id="mail">Mail: Placeholder</p>
                 <p id="phone">Phone: Placeholder</p>
                 <p id="address">City: Placeholder</p>
-                <button id="editButton">Edit</button>
-                <button id="changeRole">change role to company</button>
-                <button id="changeActiveSatatus">change active status</button>
+                <div class="button-group">
+                    <button id="editButton" class="action-button">Edit</button>
+                    <button id="changeRoleCompany" class="action-button">Change role to company</button>
+                    <button id="changeRolePro" class="action-button">Change role to pro</button>
+                    <button id="changeActiveStatus" class="action-button">Change active status</button>
+                </div>
             </div>
             <div>
                 Order List :
@@ -499,15 +525,42 @@
         }
     });
 
-    document.getElementById('changeRole').addEventListener('click', function () {
-        changeRole();
+    document.getElementById('changeRoleCompany').addEventListener('click', function () {
+        changeRole('company');
     });
 
-    document.getElementById('changeRole').addEventListener('click', function () {
-        changeRole();
+    document.getElementById('changeRolePro').addEventListener('click', function () {
+        changeRole('pro');
     });
 
-    document.getElementById('changeActiveSatatus').addEventListener('click', function () {
+    function changeRole(newRole) {
+        fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                role: newRole
+            })
+        })
+        .then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                alert(`User role updated successfully to ${newRole}`);
+                document.getElementById('role').innerText = newRole;
+            } else {
+                alert('An error occurred while updating user role');
+            }
+        }).catch(error => {
+            console.error(error);
+            alert('An error occurred while updating user role' + error);
+        });
+    }
+
+    document.getElementById('changeActiveStatus').addEventListener('click', function () {
         changeActiveStatus();
     });
 
@@ -565,32 +618,6 @@
         }).catch(error => {
             console.error(error);
             alert('An error occurred while updating user details' + error);
-        });
-    }
-
-    function changeRole() {
-        fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                role: 'company'
-            })
-        })
-            .then(function (response) {
-                return response.json();
-            }).then(function (data) {
-            console.log(data);
-            if (data.status === 'OK') {
-                alert('User role updated successfully');
-            } else {
-                alert('An error occurred while updating user role');
-            }
-        }).catch(error => {
-            console.error(error);
-            alert('An error occurred while updating user role' + error);
         });
     }
 

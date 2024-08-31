@@ -46,6 +46,11 @@ app.get('/changelog', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/changelog.html'));
 });
 
+app.get('/suggestions', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/suggestion.html'));
+});
+
+
 
 
 const corsOptions = {

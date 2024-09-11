@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARDeco Changelog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1BCFC4;
+            --secondary-color: #526ce3;
+            --text-color: #6A7482;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            width: 250px;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        #mode-toggle {
+            margin-top: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dark-mode {
+            --bg-color: #18202D;
+            --card-bg: #1F2734;
+            --text-color: white;
+            --primary-color: #2C3E50;
+        }
+
+        .changelog-container {
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .version-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .version-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .version-title {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .version-date {
+            font-size: 0.8em;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .version-content {
+            padding-top: 10px;
+            display: none;
+        }
+
+        .version-content.expanded {
+            display: block;
+        }
+
+        .changelog-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .changelog-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .dark-mode .version-item {
+            background-color: #2C3E50;
+        }
+
+        .changelog-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .changelog-container::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        .changelog-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .changelog-container::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid var(--text-color);
+            width: 80%;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: var(--text-color);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                z-index: 1000;
+                width: 100%;
+                background-color: transparent;
+            }
+
+            .sidebar.active {
+                left: 0;
+                background-color: var(--primary-color);
+            }
+
+            #menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+            }
+
+            .main-content {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="menu-toggle"><i class="fas fa-bars"></i></button>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>ARDeco Administration</h2>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                    <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
+                    <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                    <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                    <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                </ul>
+            </nav>
+            <button id="mode-toggle">Changer de thème</button>
+        </aside>
+
+        <main class="main-content">
+            <section class="card">
+                <h2>Changelog</h2>
+                <div class="changelog-container">
+                    <button id="createVersionBtn" class="changelog-button">Créer une nouvelle version</button>
+                    <div id="versionsList"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="versionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Créer une nouvelle version</h2>
+            <form id="versionForm">
+                <label for="versionNumber">Numéro de version:</label>
+                <input type="text" id="versionNumber" required>
+                
+                <label for="versionName">Nom de la version (optionnel):</label>
+                <input type="text" id="versionName">
+                
+                <label for="versionDate">Date de la version:</label>
+                <input type="date" id="versionDate" required>
+                
+                <label for="versionChanges">Liste des changements:</label>
+                <textarea id="versionChanges" required></textarea>
+                
+                <button type="submit">Sauvegarder</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let versions = [];
+
+        function fetchVersions() {
+            fetch(`https://api.ardeco.app/changelog`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "OK" && data.code === 200) {
+                        versions = data.data.map(item => ({
+                            id: item.id,
+                            numero: item.version,
+                            nom: item.name,
+                            date: new Date(item.date).toISOString().split('T')[0],
+                            changements: item.changelog.split('\n')
+                        }));
+                        renderVersions();
+                    } else {
+                        console.error('Erreur lors de la récupération du changelog:', data.description);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération du changelog:', error);
+                });
+        }
+
+        function renderVersions() {
+            const versionsList = document.getElementById('versionsList');
+            versionsList.innerHTML = '';
+            versions.forEach(version => {
+                const versionItem = document.createElement('div');
+                versionItem.className = 'version-item';
+                versionItem.innerHTML = `
+                    <div class="version-header" onclick="toggleVersion('${version.id}')">
+                        <span class="version-title">${version.numero} ${version.nom ? `- ${version.nom}` : ''}</span>
+                        <span class="version-date">${version.date}</span>
+                    </div>
+                    <div id="content-${version.id}" class="version-content">
+                        <ul>
+                            ${version.changements.map(change => `<li>${change}</li>`).join('')}
+                        </ul>
+                        <button onclick="editVersion('${version.id}')" class="changelog-button">Modifier</button>
+                        <button onclick="confirmDeleteVersion('${version.id}')" class="changelog-button">Supprimer</button>
+                    </div>
+                `;
+                versionsList.appendChild(versionItem);
+            });
+        }
+
+        function toggleVersion(id) {
+            const content = document.getElementById(`content-${id}`);
+            content.classList.toggle('expanded');
+        }
+
+        function showModal(isEdit = false, versionId = null) {
+            const modal = document.getElementById('versionModal');
+            const modalTitle = document.getElementById('modalTitle');
+            modalTitle.textContent = isEdit ? 'Modifier la version' : 'Créer une nouvelle version';
+            modal.style.display = 'block';
+            
+            if (isEdit && versionId) {
+                const version = versions.find(v => v.id === versionId);
+                if (version) {
+                    document.getElementById('versionNumber').value = version.numero;
+                    document.getElementById('versionName').value = version.nom || '';
+                    document.getElementById('versionDate').value = version.date;
+                    document.getElementById('versionChanges').value = version.changements.join('\n');
+                } else {
+                    console.error('Version non trouvée');
+                }
+            } else {
+                document.getElementById('versionForm').reset();
+                document.getElementById('versionDate').value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('versionModal').style.display = 'none';
+        }
+
+        function saveVersion(event) {
+            event.preventDefault();
+            const isEdit = document.getElementById('modalTitle').textContent === 'Modifier la version';
+            const versionNumber = document.getElementById('versionNumber').value;
+            const versionName = document.getElementById('versionName').value;
+            const versionDate = document.getElementById('versionDate').value;
+            const versionChanges = document.getElementById('versionChanges').value;
+
+            if (isEdit) {
+                const editedVersionId = document.getElementById('versionForm').dataset.editId;
+                if (editedVersionId) {
+                    fetch(`https://api.ardeco.app/changelog/${editedVersionId}`, {
+                        method: 'PUT',
+                        credentials: "include",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: versionName,
+                            version: versionNumber,
+                            changelog: versionChanges,
+                            date: versionDate
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Version modifiée:', data);
+                        closeModal();
+                        fetchVersions();
+                    })
+                    .catch(error => console.error('Erreur lors de la modification:', error));
+                } else {
+                    console.error('ID de version manquant pour la modification');
+                }
+            } else {
+                createVersion(versionName, versionNumber, versionChanges, versionDate);
+            }
+        }
+
+        function editVersion(id) {
+            showModal(true, id);
+            document.getElementById('versionForm').dataset.editId = id;
+        }
+
+        function confirmDeleteVersion(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette version ?')) {
+                deleteVersion(id);
+            }
+        }
+
+        function deleteVersion(id) {
+            fetch(`https://api.ardeco.app/changelog/${id}`, {
+                method: 'DELETE',
+                credentials: "include",
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Version supprimée:', data);
+                fetchVersions();
+            })
+            .catch(error => console.error('Erreur lors de la suppression:', error));
+        }
+
+        function createVersion(name, version, changelog, date) {
+            fetch('https://api.ardeco.app/changelog/', {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    version: version,
+                    changelog: changelog,
+                    date: date
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Version créée:', data);
+                closeModal();
+                fetchVersions(); 
+            })
+            .catch(error => console.error('Erreur lors de la création:', error));
+        }
+
+        document.getElementById('createVersionBtn').addEventListener('click', () => showModal());
+        document.querySelector('.close').addEventListener('click', closeModal);
+        document.getElementById('versionForm').addEventListener('submit', saveVersion);
+        fetchVersions();
+
+        if (localStorage.getItem('mode') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        document.getElementById('mode-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

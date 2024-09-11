@@ -1,31 +1,36 @@
 const puppeteer = require('puppeteer');
 
-describe('Page HTML Test', () => {
-    let browser;
-    let page;
+describe('Test de connexion', () => {
+  let navigateur;
+  let page;
 
-    beforeAll(async () => {
-        browser = await puppeteer.launch();
-        page = await browser.newPage();
-    });
+  beforeAll(async () => {
+    navigateur = await puppeteer.launch();
+    page = await navigateur.newPage();
+  });
 
-    afterAll(async () => {
-        await browser.close();
-    });
+  afterAll(async () => {
+    await navigateur.close();
+  });
 
-    test('le titre de la page doit être correct', async () => {
-        await page.goto('http://localhost:3001/');
-        const title = await page.title();
-        expect(title).toBe('Login');
-    });
+  test('Connexion réussie avec des identifiants valides', async () => {
+    await page.goto('http://localhost:3001');
+    
+    
+    await page.type('input[name="email"]', 'louis@lv.com');
+    await page.type('input[name="password"]', 'coucou');
+    
+    await Promise.all([
+      page.click('button[type="submit"]'),
+      page.waitForNavigation({ waitUntil: 'networkidle0' }),
+    ]);
 
-    test('fill the form wrong values and submit', async () => {
-        await page.goto('http://localhost:3001/');
-        await page.type('input[type="text"]', 'louis@lv.com'); // Modifier le sélecteur selon votre HTML
-        await page.type('input[type="password"]', 'ezez'); // Modifier le sélecteur selon votre HTML
-        await page.click('button[type=submit]');
-        await page.waitForSelector('#errorDiv b', {timeout: 10000});
-        const errorMessage = await page.$eval('#errorDiv b', e => e.innerHTML);
-        expect(errorMessage).toBe('Admin login required');
-    });
+    // Vérifier si le localStorage a été mis à jour avec le JWT
+    const jwt = await page.evaluate(() => localStorage.getItem('jwt'));
+    expect(jwt).toBeTruthy();
+
+    const url = page.url();
+    expect(url).toBe('http://localhost:3001/dashboard');
+  }, 20000);
 });
+

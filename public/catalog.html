@@ -412,21 +412,24 @@
         }
 
         .modal-footer {
-            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
             margin-top: 20px;
         }
 
-        .modal-footer button {
-            padding: 10px 20px;
-            background-color: var(--primary-color);
+        .cancel-button {
+            background-color: #6c757d;
             color: white;
             border: none;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        .modal-footer button:hover {
-            background-color: var(--secondary-color);
+        .cancel-button:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
@@ -530,6 +533,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" onclick="sendEditedProduct()">Modifier</button>
+                    <button type="button" onclick="closeModal()" class="cancel-button">Annuler</button>
                 </div>
             </form>
         </div>
@@ -569,16 +573,16 @@
                 productDiv.classList.add('product');
                 const styles = Array.isArray(product.styles) ? product.styles.join(', ') : product.styles;
                 const rooms = Array.isArray(product.rooms) ? product.rooms.join(', ') : product.rooms;
-                const colors = Array.isArray(product.colors) ? product.colors.join(', ') : product.colors;
+                const colors = product.colors.map(c => c.color).join(', ');
                 productDiv.innerHTML = `
                     <p>${product.id}</p>
                     <p>${product.name}</p>
-                    <p>${product.price}</p>
+                    <p>${product.price}€</p>
                     <p>${styles}</p>
                     <p>${rooms}</p>
                     <p>${colors}</p>
                     <p>${product.company}: ${product.company_name}</p>
-                    <button onclick='openEditProduct(${product.id}, ${product.company}, "${product.name.replace(/"/g, "&quot;")}", ${product.price}, "${styles.replace(/"/g, "&quot;")}", "${rooms.replace(/"/g, "&quot;")}", "${colors.replace(/"/g, "&quot;")}")'>Edit</button>
+                    <button onclick='openEditProduct(${JSON.stringify(product)})'>Edit</button>
                     <button style="background-color: #FF4D4D;">Delete</button>
                 `;
                 catalog.appendChild(productDiv);
@@ -660,6 +664,25 @@
             });
         }
 
+        function openEditProduct(product) {
+            idEdit = product.id;
+            companyEdit = product.company;
+            const modal = document.getElementById('edit-popup');
+            modal.style.display = 'block';
+            
+            document.getElementById('edit-name').value = product.name;
+            document.getElementById('edit-price').value = product.price;
+            document.getElementById('edit-height').value = product.height;
+            document.getElementById('edit-width').value = product.width;
+            document.getElementById('edit-depth').value = product.depth;
+            document.getElementById('edit-object-id').value = product.object_id;
+            document.getElementById('edit-company-name').value = product.company_name;
+
+            selectTags('edit-styles', product.styles);
+            selectTags('edit-rooms', product.rooms);
+            selectTags('edit-colors', product.colors.map(c => c.color));
+        }
+
         function sendEditedProduct() {
             const name = document.getElementById('edit-name').value;
             const price = parseFloat(document.getElementById('edit-price').value);
@@ -668,7 +691,7 @@
             const depth = parseFloat(document.getElementById('edit-depth').value);
             const styles = getSelectedTags('edit-styles');
             const rooms = getSelectedTags('edit-rooms');
-            const colors = getSelectedTags('edit-colors');
+            const colors = getSelectedTags('edit-colors').map(color => ({ color, model_id: 0 }));
             const object_id = document.getElementById('edit-object-id').value;
             const company_name = document.getElementById('edit-company-name').value;
 
@@ -758,23 +781,10 @@
             }
         };
 
-        function openEditProduct(id, company, name, price, styles, rooms, colors) {
-            idEdit = id;
-            companyEdit = company;
-            const modal = document.getElementById('edit-popup');
-            modal.style.display = 'block';
-            
-            document.getElementById('edit-name').value = name;
-            document.getElementById('edit-price').value = price;
-
-            selectTags('edit-styles', styles.split(','));
-            selectTags('edit-rooms', rooms.split(','));
-            selectTags('edit-colors', colors.split(','));
-        }
-
         function closeModal() {
             const modal = document.getElementById('edit-popup');
             modal.style.display = 'none';
+            document.getElementById('edit-form').reset();
         }
 
         document.querySelector('.close').addEventListener('click', closeModal);
@@ -782,7 +792,7 @@
         window.onclick = function(event) {
             const modal = document.getElementById('edit-popup');
             if (event.target == modal) {
-                modal.style.display = "none";
+                closeModal();
             }
         }
     </script>

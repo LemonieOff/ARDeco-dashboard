@@ -95,13 +95,13 @@
             --primary-color: #2C3E50;
         }
 
-        .suggestions-container {
+        .feedback-container {
             padding: 20px;
             max-height: 80vh;
             overflow-y: auto;
         }
 
-        .suggestion-item {
+        .feedback-item {
             background-color: var(--card-bg);
             padding: 15px;
             margin-bottom: 15px;
@@ -110,39 +110,39 @@
             transition: all 0.3s ease;
         }
 
-        .suggestion-item:hover {
+        .feedback-item:hover {
             transform: translateY(-3px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .suggestion-header {
+        .feedback-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
         }
 
-        .suggestion-title {
+        .feedback-title {
             font-weight: bold;
             margin-right: 10px;
         }
 
-        .suggestion-date {
+        .feedback-date {
             font-size: 0.8em;
             color: var(--text-color);
             opacity: 0.7;
         }
 
-        .suggestion-content {
+        .feedback-content {
             padding-top: 10px;
             display: none;
         }
 
-        .suggestion-content.expanded {
+        .feedback-content.expanded {
             display: block;
         }
 
-        .suggestion-button {
+        .feedback-button {
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -152,7 +152,7 @@
             transition: background-color 0.3s;
         }
 
-        .suggestion-button:hover {
+        .feedback-button:hover {
             background-color: var(--secondary-color);
         }
 
@@ -254,9 +254,18 @@
 
         <main class="main-content">
             <section class="card">
-                <h2>Suggestions</h2>
-                <div class="suggestions-container">
+                <h2>Retours utilisateurs</h2>
+                <div class="feedback-container">
+                    <h3>Suggestions</h3>
                     <div id="suggestionsList"></div>
+                </div>
+                <div class="feedback-container">
+                    <h3>Bugs</h3>
+                    <div id="bugsList"></div>
+                </div>
+                <div class="feedback-container">
+                    <h3>Feedbacks</h3>
+                    <div id="feedbacksList"></div>
                 </div>
             </section>
         </main>
@@ -271,9 +280,13 @@
     </div>
 
     <script>
-        let suggestions = [];
+        let feedbacks = {
+            suggestions: [],
+            bugs: [],
+            feedbacks: []
+        };
 
-        function fetchSuggestions() {
+        function fetchFeedbacks() {
             fetch(`https://api.ardeco.app/feedbacks`, {
                 method: 'GET',
                 credentials: "include",
@@ -284,69 +297,78 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === "OK" && data.code === 200) {
-                    suggestions = data.data.filter(item => item.type === "suggestion" && !item.processed);
-                    console.log("Suggestions récupérées:", suggestions);
-                    renderSuggestions();
+                    feedbacks.suggestions = data.data.filter(item => item.type === "suggestion" && !item.processed);
+                    feedbacks.bugs = data.data.filter(item => item.type === "bug" && !item.processed);
+                    feedbacks.feedbacks = data.data.filter(item => item.type === "feedback" && !item.processed);
+                    console.log("Retours récupérés:", feedbacks);
+                    renderFeedbacks();
                 } else {
-                    console.error('Erreur lors de la récupération des suggestions:', data.description);
+                    console.error('Erreur lors de la récupération des retours:', data.description);
                 }
             })
             .catch(error => {
-                console.error('Erreur lors de la récupération des suggestions:', error);
+                console.error('Erreur lors de la récupération des retours:', error);
             });
         }
 
-        function renderSuggestions() {
-            const suggestionsList = document.getElementById('suggestionsList');
-            suggestionsList.innerHTML = '';
-            suggestions.forEach(suggestion => {
-                const suggestionItem = document.createElement('div');
-                suggestionItem.className = 'suggestion-item';
-                const date = new Date(suggestion.date).toLocaleDateString('fr-FR');
-                suggestionItem.innerHTML = `
-                    <div class="suggestion-header" onclick="toggleSuggestion(${suggestion.id})">
-                        <span class="suggestion-title">ID: ${suggestion.id} | Utilisateur: ${suggestion.user_id}</span>
-                        <span class="suggestion-date">${date}</span>
+        function renderFeedbacks() {
+            renderFeedbackType('suggestions', 'suggestionsList');
+            renderFeedbackType('bugs', 'bugsList');
+            renderFeedbackType('feedbacks', 'feedbacksList');
+        }
+
+        function renderFeedbackType(type, listId) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            feedbacks[type].forEach(item => {
+                const feedbackItem = document.createElement('div');
+                feedbackItem.className = 'feedback-item';
+                const date = new Date(item.date).toLocaleDateString('fr-FR');
+                feedbackItem.innerHTML = `
+                    <div class="feedback-header" onclick="toggleFeedback('${type}', ${item.id})">
+                        <span class="feedback-title">ID: ${item.id} | Utilisateur: ${item.user_id}</span>
+                        <span class="feedback-date">${date}</span>
                     </div>
-                    <div id="content-${suggestion.id}" class="suggestion-content">
-                        <p>${suggestion.feedback}</p>
-                        <button onclick="showSuggestionDetails(${suggestion.id})" class="suggestion-button">Détail</button>
+                    <div id="content-${type}-${item.id}" class="feedback-content">
+                        <p>${item.feedback}</p>
+                        <button onclick="showFeedbackDetails('${type}', ${item.id})" class="feedback-button">Détail</button>
                     </div>
                 `;
-                suggestionsList.appendChild(suggestionItem);
+                list.appendChild(feedbackItem);
             });
         }
 
-        function toggleSuggestion(id) {
-            const content = document.getElementById(`content-${id}`);
+        function toggleFeedback(type, id) {
+            const content = document.getElementById(`content-${type}-${id}`);
             content.classList.toggle('expanded');
         }
 
-        function showSuggestionDetails(id) {
-            console.log("Affichage des détails pour la suggestion ID:", id);
-            const suggestion = suggestions.find(s => s.id === id);
-            if (suggestion) {
-                console.log("Suggestion trouvée:", suggestion);
+        function showFeedbackDetails(type, id) {
+            console.log(`Affichage des détails pour le ${type} ID:`, id);
+            const item = feedbacks[type].find(f => f.id === id);
+            if (item) {
+                console.log(`${type} trouvé:`, item);
                 const detailsContainer = document.getElementById('suggestionDetails');
                 detailsContainer.innerHTML = `
-                    <p><strong>ID:</strong> ${suggestion.id}</p>
-                    <p><strong>ID Utilisateur:</strong> ${suggestion.user_id}</p>
-                    <p><strong>Suggestion:</strong> ${suggestion.feedback}</p>
-                    <p><strong>Date de création:</strong> ${new Date(suggestion.date).toLocaleString()}</p>
-                    <p><strong>Traité:</strong> ${suggestion.processed ? 'Oui' : 'Non'}</p>
-                    <button onclick="processSuggestion(${suggestion.id})" class="suggestion-button" ${suggestion.processed ? 'disabled' : ''}>
-                        ${suggestion.processed ? 'Déjà traité' : 'Traiter la suggestion'}
+                    <p><strong>ID:</strong> ${item.id}</p>
+                    <p><strong>ID Utilisateur:</strong> ${item.user_id}</p>
+                    <p><strong>Type:</strong> ${item.type}</p>
+                    <p><strong>Contenu:</strong> ${item.feedback}</p>
+                    <p><strong>Date de création:</strong> ${new Date(item.date).toLocaleString()}</p>
+                    <p><strong>Traité:</strong> ${item.processed ? 'Oui' : 'Non'}</p>
+                    <button onclick="processFeedback(${item.id})" class="feedback-button" ${item.processed ? 'disabled' : ''}>
+                        ${item.processed ? 'Déjà traité' : 'Traiter'}
                     </button>
                 `;
                 const modal = document.getElementById('suggestionModal');
                 modal.style.display = 'block';
                 console.log("Modal affiché");
             } else {
-                console.error("Suggestion non trouvée pour l'ID:", id);
+                console.error(`${type} non trouvé pour l'ID:`, id);
             }
         }
 
-        function processSuggestion(id) {
+        function processFeedback(id) {
             fetch(`https://api.ardeco.app/feedbacks/process/${id}`, {
                 method: 'PUT',
                 credentials: "include",
@@ -357,16 +379,16 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === "OK") {
-                    alert('Suggestion traitée avec succès');
-                    fetchSuggestions();
+                    alert('Retour traité avec succès');
+                    fetchFeedbacks();
                     closeModal();
                 } else {
-                    alert('Erreur lors du traitement de la suggestion');
+                    alert('Erreur lors du traitement du retour');
                 }
             })
             .catch(error => {
-                console.error('Erreur lors du traitement de la suggestion:', error);
-                alert('Erreur lors du traitement de la suggestion');
+                console.error('Erreur lors du traitement du retour:', error);
+                alert('Erreur lors du traitement du retour');
             });
         }
 
@@ -396,7 +418,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             setActiveTab();
-            fetchSuggestions();
+            fetchFeedbacks();
         });
 
         if (localStorage.getItem('mode') === 'dark') {

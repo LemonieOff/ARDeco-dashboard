@@ -167,12 +167,20 @@
             color: var(--primary-color);
             font-size: 24px;
             cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 10px;
             z-index: 1001;
         }
 
         @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+            }
+
             .container {
                 flex-direction: column;
+                height: auto;
             }
 
             .sidebar {
@@ -199,6 +207,8 @@
 
             .main-content {
                 margin-top: 50px;
+                height: auto;
+                overflow-y: visible;
             }
         }
     </style>

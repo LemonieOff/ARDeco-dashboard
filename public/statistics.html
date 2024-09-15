@@ -22,11 +22,13 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
+            overflow-y: hidden;
         }
 
         .container {
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .sidebar {
@@ -67,6 +69,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+            overflow-y: auto;
         }
 
         .card {
@@ -109,8 +112,13 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+            }
+
             .container {
                 flex-direction: column;
+                height: auto;
             }
 
             .sidebar {
@@ -138,6 +146,8 @@
             .main-content {
                 margin-top: 50px;
                 grid-template-columns: 1fr;
+                height: auto;
+                overflow-y: visible;
             }
         }
     </style>

@@ -50,6 +50,9 @@ app.get('/suggestions', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/suggestion.html'));
 });
 
+app.get('/galleries', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/galleries.html'));
+});
 
 
 

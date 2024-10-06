@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARDeco Galeries</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1BCFC4;
+            --secondary-color: #526ce3;
+            --text-color: #6A7482;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            width: 250px;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+        }
+
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        #mode-toggle {
+            margin-top: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dark-mode {
+            --bg-color: #18202D;
+            --card-bg: #1F2734;
+            --text-color: white;
+            --primary-color: #2C3E50;
+        }
+
+        .galleries-container {
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .gallery-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .gallery-content {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .gallery-content.expanded {
+            display: block;
+        }
+
+        .gallery-button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -250px;
+                height: 100%;
+                z-index: 1000;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            #menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1001;
+            }
+
+            .main-content {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="menu-toggle"><i class="fas fa-bars"></i></button>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>ARDeco Administration</h2>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                    <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
+                    <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                    <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                    <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                    <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                </ul>
+            </nav>
+            <button id="mode-toggle">Changer de thème</button>
+        </aside>
+
+        <main class="main-content">
+            <section class="card galleries-container">
+                <h2>Galeries</h2>
+                <div id="galleries-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="galleryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="galleryDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        let galleries = [];
+
+        if (localStorage.getItem('mode') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        document.getElementById('mode-toggle').addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('mode', 'dark');
+            } else {
+                localStorage.setItem('mode', 'light');
+            }
+        });
+
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        });
+
+        function getGalleries() {
+            fetch('https://api.ardeco.app/gallery', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    galleries = data.data;
+                    displayGalleries(galleries);
+                } else {
+                    console.error('Erreur lors de la récupération des galeries:', data.description);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des galeries:', error);
+            });
+        }
+
+        function displayGalleries(galleries) {
+            const galleriesList = document.getElementById('galleries-list');
+            galleriesList.innerHTML = '';
+            galleries.forEach(gallery => {
+                const galleryItem = document.createElement('div');
+                galleryItem.classList.add('gallery-item');
+                galleryItem.innerHTML = `
+                    <div class="gallery-header" onclick="toggleGallery(${gallery.id})">
+                        <span class="gallery-title">ID: ${gallery.id} | Nom: ${gallery.name}</span>
+                        <span class="gallery-room">${gallery.room}</span>
+                    </div>
+                    <div id="content-${gallery.id}" class="gallery-content">
+                        <p><strong>Description:</strong> ${gallery.description || 'Aucune description'}</p>
+                        <p><strong>Style:</strong> ${gallery.style}</p>
+                        <p><strong>Visibilité:</strong> ${gallery.visibility ? 'Visible' : 'Non visible'}</p>
+                        <p><strong>Utilisateur ID:</strong> ${gallery.user.id}</p>
+                        <p><strong>Nombre de modèles:</strong> ${gallery.model_data.length}</p>
+                        <p><strong>Nombre de commentaires:</strong> ${gallery.comments.length}</p>
+                        <button onclick="showGalleryDetails(${gallery.id})" class="gallery-button">Détails</button>
+                    </div>
+                `;
+                galleriesList.appendChild(galleryItem);
+            });
+        }
+
+        function toggleGallery(id) {
+            const content = document.getElementById(`content-${id}`);
+            content.classList.toggle('expanded');
+        }
+
+        function showGalleryDetails(id) {
+            console.log("Affichage des détails pour la galerie ID:", id);
+            const gallery = galleries.find(g => g.id === id);
+            if (gallery) {
+                getGalleryComments(id).then(comments => {
+                    const detailsContainer = document.getElementById('galleryDetails');
+                    detailsContainer.innerHTML = `
+                        <h3>Détails de la galerie</h3>
+                        <p><strong>ID:</strong> ${gallery.id}</p>
+                        <p><strong>Nom:</strong> ${gallery.name}</p>
+                        <p><strong>Description:</strong> ${gallery.description || 'Aucune description'}</p>
+                        <p><strong>Pièce:</strong> ${gallery.room}</p>
+                        <p><strong>Style:</strong> ${gallery.style}</p>
+                        <p><strong>Visibilité:</strong> ${gallery.visibility ? 'Visible' : 'Non visible'}</p>
+                        <p><strong>Utilisateur ID:</strong> ${gallery.user.id}</p>
+                        <h4>Meubles:</h4>
+                        <ul>
+                            ${gallery.model_data.map(model => `
+                                <li>
+                                    ID: ${model.id}, 
+                                    Model ID: ${model.model_id}, 
+                                    Position: (${model.position_x}, ${model.position_y}, ${model.position_z})
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <h4>Commentaires:</h4>
+                        <ul>
+                            ${comments.map(comment => `
+                                <li>
+                                    <p><strong>Utilisateur ID:</strong> ${comment.user_id}</p>
+                                    <p><strong>Commentaire:</strong> ${comment.comment}</p>
+                                    <p><strong>Date:</strong> ${new Date(comment.creation_date).toLocaleString()}</p>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                    const modal = document.getElementById('galleryModal');
+                    modal.style.display = 'block';
+                });
+            } else {
+                console.error("Galerie non trouvée pour l'ID:", id);
+            }
+        }
+
+        function setActiveTab() {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        function getGalleryComments(galleryId) {
+            return fetch(`https://api.ardeco.app/gallery/${galleryId}/comments`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    return data.data;
+                } else {
+                    console.error('Erreur lors de la récupération des commentaires:', data.description);
+                    return [];
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des commentaires:', error);
+                return [];
+            });
+        }
+
+        document.querySelector('.close').addEventListener('click', function() {
+            document.getElementById('galleryModal').style.display = 'none';
+        });
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('galleryModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveTab();
+            getGalleries();
+        });
+    </script>
+</body>
+</html>

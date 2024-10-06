@@ -583,7 +583,7 @@
                     <p>${colors}</p>
                     <p>${product.company}: ${product.company_name}</p>
                     <button onclick='openEditProduct(${JSON.stringify(product)})'>Edit</button>
-                    <button style="background-color: #FF4D4D;">Delete</button>
+                    <button style="background-color: #FF4D4D;" onclick="archiveProduct(${product.company}, ${product.id})">Archive</button>
                 `;
                 catalog.appendChild(productDiv);
             });
@@ -662,6 +662,26 @@
             document.querySelectorAll(`#${containerId} .tag`).forEach(tag => {
                 tag.classList.toggle('selected', values.includes(tag.textContent));
             });
+        }
+
+        function archiveProduct(company, id) {
+            fetch(`https://api.ardeco.app/catalog/${company}/archive/${id}`, {
+                method: "DELETE",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Produit archivé:", data);
+                    if (data.status === "OK") {
+                        getCatalog(currentFilters);
+                    } else {
+                        console.error("Erreur lors de l'archivage:", data.description);
+                    }
+                })
+                .catch(error => console.error("Erreur lors de l'archivage:", error));
         }
 
         function openEditProduct(product) {

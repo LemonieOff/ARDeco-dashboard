@@ -446,6 +446,7 @@
                     <li><a href="/statistics" id="statistics-link"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
                     <li><a href="/changelog" id="changelog-link"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
                     <li><a href="/suggestions" id="suggestions-link"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                    <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
@@ -582,9 +583,11 @@
                     <p>${rooms}</p>
                     <p>${colors}</p>
                     <p>${product.company}: ${product.company_name}</p>
+                    <p>${product.active ? 'Active' : 'Inactive'}</p>
                     <button onclick='openEditProduct(${JSON.stringify(product)})'>Edit</button>
                     <button style="background-color: #FF4D4D;" onclick="archiveProduct(${product.company}, ${product.id})">Archive</button>
-                `;
+                    <button style="background-color: #80669d;" onclick="changeVisibility(${product.company}, ${product.id}, ${product.active})">${product.active ? 'Hide' : 'Display'}</button>
+                    `;
                 catalog.appendChild(productDiv);
             });
         }
@@ -682,6 +685,26 @@
                     }
                 })
                 .catch(error => console.error("Erreur lors de l'archivage:", error));
+        }
+
+        function changeVisibility(company, id, currentVisibility) {
+            fetch(`https://api.ardeco.app/catalog/${company}/edit/${id}`, {
+                method: "PUT",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ active: !currentVisibility })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Visibilité modifiée:", data);
+                if (data.status === "OK") {
+                    getCatalog(currentFilters);
+                } else {
+                    console.error("Erreur lors de la modification de la visibilité:", data.description);
+                }
+            })
         }
 
         function openEditProduct(product) {

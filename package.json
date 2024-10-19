@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.0.0",
+    "express": "^5.0.1",
     "puppeteer": "^22.11.2"
   },
   "devDependencies": {

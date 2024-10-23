@@ -565,6 +565,7 @@
                 <div class="form-group">
                     <label for="add-colors">Couleurs :</label>
                     <div id="add-colors" class="tag-container"></div>
+                    <div id="color-inputs"></div>
                 </div>
                 <div class="form-group">
                     <label for="add-rooms">Pièces :</label>
@@ -745,18 +746,44 @@
         function populateAddFormOptions() {
                 createTags('add-styles', officialValues.styles);
                 createTags('add-rooms', officialValues.rooms);
-                createTags('add-colors', officialValues.colors);
+                createTags('add-colors', officialValues.colors, true);
         }
 
-        function createTags(containerId, values) {
+        function createTags(containerId, values, isColor = false) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-            values.forEach(value => {
+            values.forEach((value) => {
                 const tag = document.createElement('div');
                 tag.classList.add('tag');
                 tag.textContent = value;
+
+                let modelIdInput;
+                let colorLabel;
+                if (isColor) {
+                    modelIdInput = document.createElement('input');
+                    modelIdInput.type = 'text';
+                    modelIdInput.id = `model-id-${value}`;
+                    modelIdInput.placeholder = 'ID du modèle';
+
+                    colorLabel = document.createElement('label');
+                    colorLabel.textContent = `ID du modèle pour ${value} :`;
+                    colorLabel.htmlFor = modelIdInput.id;
+                }
+
                 tag.onclick = function() {
                     this.classList.toggle('selected');
+                    if (this.classList.contains('selected')) {
+                        if (isColor) {
+                            const colorInputContainer = document.getElementById('color-inputs');
+                            colorInputContainer.appendChild(colorLabel);
+                            colorInputContainer.appendChild(modelIdInput);
+                        }
+                    } else {
+                        if (isColor) {
+                            colorLabel.remove();
+                            modelIdInput.remove();
+                        }
+                    }
                 };
                 container.appendChild(tag);
             });
@@ -955,6 +982,7 @@
         }
 
         function sendNewProduct() {
+            const companyId = document.getElementById('add-company-id').value;
             const name = document.getElementById('add-name').value.trim();
             const price = parseFloat(document.getElementById('add-price').value);
             const height = parseFloat(document.getElementById('add-height').value);
@@ -964,7 +992,12 @@
             const company_name = document.getElementById('add-company-name').value.trim();
             const rooms = getSelectedTags('add-rooms');
             const styles = getSelectedTags('add-styles');
-            const colors = getSelectedTags('add-colors').map(color => ({ color, model_id: 0 }));
+
+            const colors = getSelectedTags('add-colors').map((color) => {
+                const modelIdInput = document.getElementById(`model-id-${color}`);
+                const modelId = modelIdInput ? modelIdInput.value : '';
+                return { color, model_id: modelId };
+            });
 
             const newProductData = [{}];
             newProductData[0].name = name;
@@ -977,6 +1010,7 @@
             newProductData[0].colors = colors;
             newProductData[0].rooms = rooms;
             newProductData[0].styles = styles;
+    
 
             console.log(newProductData);
 
@@ -984,6 +1018,11 @@
             resetErrors();
 
             let hasError = false;
+
+            if (!companyId) {
+                showError('add-company-id');
+                hasError = true;
+            }
 
             if (!name) {
                 showError('add-name');
@@ -1024,7 +1063,6 @@
 
         
 
-            const companyId = document.getElementById('add-company-id').value;
 
             fetch(`https://api.ardeco.app/catalog/${companyId}/add/`, {
                 method: 'POST',

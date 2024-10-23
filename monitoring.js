@@ -54,6 +54,9 @@ app.get('/galleries', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/galleries.html'));
 });
 
+app.get('/archives', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/archives.html'));
+});
 
 
 const corsOptions = {

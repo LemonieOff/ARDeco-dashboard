@@ -200,6 +200,15 @@
                 margin-top: 50px;
             }
         }
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -216,9 +225,12 @@
                     <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
                     <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
                     <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton">Déconnexion</button>
+            
         </aside>
 
         <main class="main-content">
@@ -262,8 +274,11 @@
             document.getElementById('deleteButton').addEventListener('click', deleteTicket);
         });
 
-        function getTicket(isBottom, currentScroll) {
+        document.addEventListener('DOMContentLoaded', function() {
             getUserRole();
+        });
+
+        function getTicket(isBottom, currentScroll) {
             fetch(`https://api.ardeco.app/ticket/${window.location.pathname.split('/').pop()}`, {
                 method: 'GET',
                 credentials: 'include',
@@ -278,28 +293,32 @@
                 if (data.status === 'OK') {
                     console.log(data.data);
                     let messages = data.data.messages;
+                    const messagesContainer = document.querySelector('#messages-list');
+                    let existingMessages = messagesContainer.children.length;
+
                     for (let i = 0; i < messages.length; i++) {
-                        console.log(messages[i]);
-                        let message = document.createElement('div');
-                        let dateText = document.createElement('div');
+                        if (i >= existingMessages) {
+                            let message = document.createElement('div');
+                            let dateText = document.createElement('div');
 
-                        if (messages[i].sender === "Support") {
-                            message.classList.add('right')
-                            dateText.classList.add('right')
+                            if (messages[i].sender === "Support") {
+                                message.classList.add('right');
+                                dateText.classList.add('right');
+                            }
+                            message.classList.add('message');
+                            let string = messages[i].timestamp.replace(/,/g, '');
+                            let timestamp = parseInt(string, 10);
+                            let date = new Date(timestamp);
+                            dateText.innerHTML = date.toLocaleString();
+
+                            message.innerHTML = messages[i].sender + ":" + '<br>' + messages[i].content + '<br><br>' + date.toLocaleString();
+                            messagesContainer.appendChild(message);
                         }
-                        message.classList.add('message');
-                        let string = messages[i].timestamp.replace(/,/g, '');
-                        let timestamp = parseInt(string, 10);
-                        let date = new Date(timestamp);
-                        dateText.innerHTML = date.toLocaleString();
-
-                        message.innerHTML = messages[i].sender + ":" + '<br>' + messages[i].content + '<br><br>' + date.toLocaleString();
-                        document.querySelector('#messages-list').appendChild(message);
                     }
                     if (isBottom)
-                        document.querySelector('#messages-list').scrollTop = document.querySelector('#messages-list').scrollHeight;
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
                     else
-                        document.querySelector('#messages-list').scrollTop = currentScroll;
+                        messagesContainer.scrollTop = currentScroll;
                 }
             }).catch(error => {
                 console.error(error);
@@ -337,7 +356,7 @@
             let isBottom = document.querySelector('#messages-list').scrollHeight - document.querySelector('#messages-list').scrollTop === document.querySelector('#messages-list').clientHeight;
             let currentScroll = document.querySelector('#messages-list').scrollTop;
             const messagesContainer = document.querySelector('#messages-list');
-            messagesContainer.innerHTML = '';
+            // messagesContainer.innerHTML = ''; // Supprimer cette ligne pour éviter le clignotement
             getTicket(isBottom, currentScroll);
         }
 
@@ -373,28 +392,29 @@
             refreshMessages();
         }, 10000);
 
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
+
         function getUserRole() {
             if (localStorage.getItem("uid")) {
                 fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
                     method: 'GET',
                     credentials: "include",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                 })
-                .then(function (response) {
-                    return response.json();
-                }).then(function (data) {
-                    console.log(data);
+                .then(response => response.json())
+                .then(data => {
                     if (data.status === 'OK') {
-                        if (data.data.role === 'admin') {
-                            console.log('Admin');
-                        } else {
-                            window.location = "/";
-                            console.log('Login as admin to access dashboard');
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
                         }
+                        else checkJWT();
                     }
-                }).catch(error => {
+                })
+                .catch(error => {
                     window.location = "/";
                     console.error(error);
                 });
@@ -402,6 +422,26 @@
                 window.location = "/";
             }
         }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
+
+
     </script>
 </body>
 </html>

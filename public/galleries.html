@@ -203,6 +203,16 @@
                 margin-top: 50px;
             }
         }
+
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -219,9 +229,11 @@
                     <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
                     <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
                     <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton">Déconnexion</button>
         </aside>
 
         <main class="main-content">
@@ -236,6 +248,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <div id="galleryDetails"></div>
+            <div id="galleryReports"></div>
         </div>
     </div>
 
@@ -297,6 +310,7 @@
                         <p><strong>Description:</strong> ${gallery.description || 'Aucune description'}</p>
                         <p><strong>Style:</strong> ${gallery.style}</p>
                         <p><strong>Visibilité:</strong> ${gallery.visibility ? 'Visible' : 'Non visible'}</p>
+                        <button onclick="toggleVisibility(${gallery.id}, ${gallery.visibility})" class="gallery-button">Changer Visibilité</button>
                         <p><strong>Utilisateur ID:</strong> ${gallery.user.id}</p>
                         <p><strong>Nombre de modèles:</strong> ${gallery.model_data.length}</p>
                         <p><strong>Nombre de commentaires:</strong> ${gallery.comments.length}</p>
@@ -304,6 +318,8 @@
                     </div>
                 `;
                 galleriesList.appendChild(galleryItem);
+
+                checkReports(gallery.id, galleryItem);
             });
         }
 
@@ -338,18 +354,41 @@
                             `).join('')}
                         </ul>
                         <h4>Commentaires:</h4>
-                        <ul>
+                        <ul id="comments-list">
                             ${comments.map(comment => `
                                 <li>
                                     <p><strong>Utilisateur ID:</strong> ${comment.user_id}</p>
                                     <p><strong>Commentaire:</strong> ${comment.comment}</p>
                                     <p><strong>Date:</strong> ${new Date(comment.creation_date).toLocaleString()}</p>
+                                    <button class="delete-comment-button" data-gallery-id="${gallery.id}" data-comment-id="${comment.id}">Supprimer</button>
                                 </li>
                             `).join('')}
                         </ul>
                     `;
                     const modal = document.getElementById('galleryModal');
                     modal.style.display = 'block';
+
+                    document.querySelectorAll('.delete-comment-button').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const galleryId = this.getAttribute('data-gallery-id');
+                            const commentId = this.getAttribute('data-comment-id');
+                            fetch(`https://api.ardeco.app/gallery/${galleryId}/comments/${commentId}`, {
+                                method: 'DELETE',
+                                credentials: 'include',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Commentaire supprimé:', result);
+                                showGalleryDetails(galleryId);
+                            })
+                            .catch(error => {
+                                console.error('Erreur lors de la suppression du commentaire:', error);
+                            });
+                        });
+                    });
                 });
             } else {
                 console.error("Galerie non trouvée pour l'ID:", id);
@@ -405,7 +444,187 @@
         document.addEventListener('DOMContentLoaded', function() {
             setActiveTab();
             getGalleries();
+            getUserRole();
         });
+
+        function checkReports(galleryId, galleryItem) {
+            fetch(`https://api.ardeco.app/gallery_report/${galleryId}/reports/list`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK' && data.data.length > 0) {
+                    const viewReportsButton = document.createElement('button');
+                    viewReportsButton.textContent = 'Voir signalements';
+                    viewReportsButton.classList.add('gallery-button');
+                    viewReportsButton.addEventListener('click', () => {
+                        displayReports(galleryId, data.data);
+                    });
+                    galleryItem.querySelector('.gallery-content').appendChild(viewReportsButton);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des signalements:', error);
+            });
+        }
+
+        function displayReports(galleryId, reports) { 
+            const reportsContainer = document.getElementById('galleryDetails');
+            reportsContainer.innerHTML = `
+                <h3>Signalements</h3>
+                <ul>
+                    ${reports.map(report => `
+                        <li>
+                            <p><strong>ID:</strong> ${report.id}</p>
+                            <p><strong>Statut:</strong> ${report.status}</p>
+                            <p><strong>Date:</strong> ${new Date(report.datetime).toLocaleString()}</p>
+                            <p><strong>Texte du signalement:</strong> ${report.report_text || 'Aucun texte fourni'}</p>
+                            <button class="delete-report-button" data-gallery-id="${galleryId}" data-report-id="${report.id}">Supprimer le signalement</button>
+                        </li>
+                    `).join('')}
+                </ul>
+                <button id="delete-gallery-button" data-gallery-id="${galleryId}">Supprimer définitivement la galerie</button>
+            `;
+            const modal = document.getElementById('galleryModal');
+            modal.style.display = 'block';
+
+            document.querySelectorAll('.delete-report-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const galleryId = this.getAttribute('data-gallery-id');
+                    const reportId = this.getAttribute('data-report-id');
+                    fetch(`https://api.ardeco.app/gallery_report/${galleryId}/close/${reportId}`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        console.log('Signalement supprimé:', result);
+                        getGalleryReports(galleryId);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la suppression du signalement:', error);
+                    });
+                });
+            });
+
+            document.getElementById('delete-gallery-button').addEventListener('click', function() {
+                const galleryId = this.getAttribute('data-gallery-id');
+                fetch(`https://api.ardeco.app/gallery/${galleryId}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                    console.log('Galerie supprimée:', result);
+                    document.getElementById('galleryModal').style.display = 'none';
+                    getGalleries();
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la suppression de la galerie:', error);
+                });
+            });
+        }
+
+        function getGalleryReports(galleryId) {
+            fetch(`https://api.ardeco.app/gallery_report/${galleryId}/reports/list`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    displayReports(galleryId, data.data);
+                } else {
+                    console.error('Erreur lors de la récupération des signalements:', data.description);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des signalements:', error);
+            });
+        }
+
+        function toggleVisibility(galleryId, currentVisibility) {
+            const newVisibility = currentVisibility ? 0 : 1;
+            fetch(`https://api.ardeco.app/gallery/${galleryId}`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ visibility: newVisibility })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Visibilité mise à jour:', result);
+                getGalleries(); 
+            })
+            .catch(error => {
+                console.error('Erreur lors de la mise à jour de la visibilité:', error);
+            });
+        }
+
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    window.location = "/";
+                    console.error(error);
+                });
+            } else {
+                window.location = "/";
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
+
     </script>
 </body>
 </html>

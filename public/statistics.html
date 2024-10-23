@@ -150,6 +150,15 @@
                 overflow-y: visible;
             }
         }
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -167,9 +176,11 @@
                     <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
                     <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
                     <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton">Déconnexion</button>
         </aside>
 
         <main class="main-content">
@@ -190,6 +201,10 @@
         if (localStorage.getItem('mode') === 'dark') {
             document.body.classList.add('dark-mode');
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            getUserRole();
+        });
 
         document.getElementById('mode-toggle').addEventListener('click', function() {
             document.body.classList.toggle('dark-mode');
@@ -262,34 +277,53 @@
                 console.log(document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]);
             });
 
+            document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
+
         function getUserRole() {
             if (localStorage.getItem("uid")) {
                 fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
                     method: 'GET',
                     credentials: "include",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                 })
-                    .then(function (response) {
-                        return response.json();
-                    }).then(function (data) {
-                    console.log(data);
+                .then(response => response.json())
+                .then(data => {
                     if (data.status === 'OK') {
-                        if (data.data.role === 'admin') {
-                            console.log('Admin');
-                        } else {
-                            window.location = "/";
-                            console.log('Login as admin to access dashboard');
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
                         }
+                        else checkJWT();
                     }
-                }).catch(error => {
+                })
+                .catch(error => {
                     window.location = "/";
                     console.error(error);
                 });
             } else {
                 window.location = "/";
             }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
         }
     </script>
 </body>

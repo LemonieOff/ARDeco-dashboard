@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARDeco Archives</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1BCFC4;
+            --secondary-color: #526ce3;
+            --text-color: #6A7482;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            width: 250px;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        #mode-toggle {
+            margin-top: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dark-mode {
+            --bg-color: #18202D;
+            --card-bg: #1F2734;
+            --text-color: white;
+            --primary-color: #2C3E50;
+        }
+
+        .company-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .company-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .company-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .company-name {
+            font-weight: bold;
+        }
+
+        .archives-list {
+            padding-top: 10px;
+            display: none;
+        }
+
+        .archives-list.expanded {
+            display: block;
+        }
+
+        .object-item {
+            background-color: var(--card-bg);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .object-title {
+            font-weight: bold;
+        }
+
+        .changelog-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .changelog-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                z-index: 1000;
+                width: 100%;
+                background-color: transparent;
+            }
+
+            .sidebar.active {
+                left: 0;
+                background-color: var(--primary-color);
+            }
+
+            .main-content {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="menu-toggle"><i class="fas fa-bars"></i></button>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>ARDeco Administration</h2>
+            <nav>
+                <ul>
+                    <li><a href="/dashboard"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                    <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
+                    <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                    <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                    <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                    <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
+                </ul>
+            </nav>
+            <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton" class="action-button">Déconnexion</button>
+        </aside>
+
+        <main class="main-content">
+            <section class="card">
+                <h2>Archives</h2>
+                <div id="companies-list">
+                    <!-- Liste des entreprises sera générée ici -->
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
+
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        });
+
+        if (localStorage.getItem('mode') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        document.getElementById('mode-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchCompanies();
+            getUserRole();
+        });
+
+        function fetchCompanies() {
+            fetch('https://api.ardeco.app/user/companies', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const companiesList = document.getElementById('companies-list');
+                data.data.forEach(company => {
+                    const companyItem = document.createElement('div');
+                    companyItem.classList.add('company-item');
+
+                    const companyHeader = document.createElement('div');
+                    companyHeader.classList.add('company-header');
+
+                    const companyName = document.createElement('span');
+                    companyName.classList.add('company-name');
+                    companyName.textContent = `${company.first_name} ${company.last_name}`;
+                    companyHeader.appendChild(companyName);
+
+                    const detailsButton = document.createElement('button');
+                    detailsButton.textContent = 'Détails';
+                    detailsButton.classList.add('changelog-button');
+                    detailsButton.addEventListener('click', () => {
+                        const archivesList = document.getElementById(`archives-list-${company.id}`);
+                        if (archivesList.style.display === 'block') {
+                            archivesList.style.display = 'none'; // Masquer les archives
+                        } else {
+                            fetchArchives(company.id, archivesList); // Récupérer et afficher les archives
+                        }
+                    });
+                    companyHeader.appendChild(detailsButton);
+                    companyItem.appendChild(companyHeader);
+
+                    const archivesList = document.createElement('div');
+                    archivesList.id = `archives-list-${company.id}`;
+                    archivesList.classList.add('archives-list');
+                    companyItem.appendChild(archivesList);
+
+                    companiesList.appendChild(companyItem);
+                });
+            })
+            .catch(error => {
+                console.error('ERROR:', error);
+            });
+        }
+
+        function fetchArchives(companyId, archivesList) {
+            fetch(`https://api.ardeco.app/archive/${companyId}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                archivesList.innerHTML = ''; // Réinitialiser la liste des archives
+                data.data.forEach(archive => {
+                    const archiveItem = document.createElement('div');
+                    archiveItem.textContent = `${archive.name} - Prix: ${archive.price}€`; // Afficher le nom et le prix
+                    
+                    // Bouton pour restaurer
+                    const restoreButton = document.createElement('button');
+                    restoreButton.textContent = 'Restaurer';
+                    restoreButton.classList.add('changelog-button');
+                    restoreButton.addEventListener('click', () => {
+                        fetch(`https://api.ardeco.app/archive/restore/${companyId}/${archive.id}`, {
+                            method: 'PUT',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Restauré:', result);
+                            fetchArchives(companyId, archivesList); // Rafraîchir la liste après restauration
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors de la restauration:', error);
+                        });
+                    });
+                    archiveItem.appendChild(restoreButton);
+
+                    // Bouton pour supprimer définitivement
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Supprimer';
+                    deleteButton.classList.add('changelog-button');
+                    deleteButton.addEventListener('click', () => {
+                        fetch(`https://api.ardeco.app/archive/${companyId}/${archive.id}`, {
+                            method: 'DELETE',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log('Supprimé:', result);
+                            fetchArchives(companyId, archivesList); // Rafraîchir la liste après suppression
+                        })
+                        .catch(error => {
+                            console.error('Erreur lors de la suppression:', error);
+                        });
+                    });
+                    archiveItem.appendChild(deleteButton);
+
+                    archivesList.appendChild(archiveItem);
+                });
+                archivesList.style.display = 'block'; // Afficher la liste des archives
+            })
+            .catch(error => {
+                console.error('ERROR:', error);
+            });
+        }
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    window.location = "/";
+                    console.error(error);
+                });
+            } else {
+                window.location = "/";
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
+    </script>
+</body>
+</html>

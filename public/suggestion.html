@@ -232,6 +232,15 @@
                 margin-top: 50px;
             }
         }
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -241,16 +250,18 @@
             <h2>ARDeco Administration</h2>
             <nav>
                 <ul>
-                    <li><a href="/dashboard" id="dashboard-link"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                    <li><a href="/users" id="users-link"><i class="fas fa-user"></i> Utilisateurs</a></li>
-                    <li><a href="/catalog" id="catalog-link"><i class="fas fa-book"></i> Catalogue</a></li>
-                    <li><a href="/statistics" id="statistics-link"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
-                    <li><a href="/changelog" id="changelog-link"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
-                    <li><a href="/suggestions" id="suggestions-link"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
-                    <li><a href="/galleries" id="galleries-link"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/dashboard"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                    <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
+                    <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                    <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                    <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                    <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton">Déconnexion</button>
         </aside>
 
         <main class="main-content">
@@ -420,6 +431,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             setActiveTab();
             fetchFeedbacks();
+            getUserRole();
         });
 
         if (localStorage.getItem('mode') === 'dark') {
@@ -435,6 +447,55 @@
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('active');
         });
+
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    window.location = "/";
+                    console.error(error);
+                });
+            } else {
+                window.location = "/";
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
     </script>
 </body>
 </html>

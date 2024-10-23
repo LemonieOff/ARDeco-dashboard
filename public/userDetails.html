@@ -185,6 +185,15 @@
                 grid-template-columns: 1fr;
             }
         }
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -201,9 +210,11 @@
                 <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
                 <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
                 <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
             </ul>
         </nav>
         <button id="mode-toggle">Changer de thème</button>
+        <button id="logoutButton">Déconnexion</button>
     </aside>
 
     <main class="main-content">
@@ -314,35 +325,6 @@
         });
     }
 
-    function getUserRole() {
-        if (localStorage.getItem("uid")) {
-            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
-                method: 'GET',
-                credentials: "include",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-                .then(function (response) {
-                    return response.json();
-                }).then(function (data) {
-                console.log(data);
-                if (data.status === 'OK') {
-                    if (data.data.role === 'admin') {
-                        console.log('Admin');
-                    } else {
-                        window.location = "/";
-                        console.log('Login as admin to access dashboard');
-                    }
-                }
-            }).catch(error => {
-                window.location = "/";
-                console.error(error);
-            });
-        } else {
-            window.location = "/";
-        }
-    }
 
     document.getElementById('editButton').addEventListener('click', function () {
         const isEditing = document.getElementById('editButton').innerText === 'Save';
@@ -362,6 +344,10 @@
 
     document.getElementById('changeRolePro').addEventListener('click', function () {
         changeRole('pro');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        getUserRole();
     });
 
     function changeRole(newRole) {
@@ -480,6 +466,54 @@
         sidebar.classList.toggle('active');
     });
 
+    document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    window.location = "/";
+                    console.error(error);
+                });
+            } else {
+                window.location = "/";
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
 </script>
 </body>
 </html>

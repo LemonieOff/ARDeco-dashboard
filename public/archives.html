@@ -241,6 +241,7 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             fetchCompanies();
+            getUserRole();
         });
 
         function fetchCompanies() {
@@ -363,7 +364,48 @@
             });
         }
 
-    
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    window.location = "/";
+                    console.error(error);
+                });
+            } else {
+                window.location = "/";
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
     </script>
 </body>
 </html>

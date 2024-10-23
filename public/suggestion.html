@@ -261,6 +261,7 @@
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton">Déconnexion</button>
         </aside>
 
         <main class="main-content">
@@ -430,6 +431,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             setActiveTab();
             fetchFeedbacks();
+            getUserRole();
         });
 
         if (localStorage.getItem('mode') === 'dark') {
@@ -445,6 +447,55 @@
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('active');
         });
+
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            window.location = "/"                        
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    window.location = "/";
+                    console.error(error);
+                });
+            } else {
+                window.location = "/";
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
     </script>
 </body>
 </html>

@@ -506,6 +506,59 @@
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('active');
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            //wait 1 second before checking JWT
+            setTimeout(getUserRole, 500);
+        });
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            console.log("user is not admin");
+                            //window.location = "/"                        
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    console.log("error:", error);
+                    //window.location = "/";
+                    
+                    console.error(error);
+                });
+            } else {
+               // window.location = "/";
+               console.log("user is not logged in");
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        console.log("JWT is invalid");
+                        //window.location = "/";
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
     </script>
 </body>
 </html>

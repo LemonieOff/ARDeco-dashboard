@@ -83,6 +83,16 @@
             cursor: pointer;
         }
 
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
         .dark-mode {
             --bg-color: #18202D;
             --card-bg: #1F2734;
@@ -248,6 +258,8 @@
                 margin-top: 50px;
             }
         }
+
+        
     </style>
 </head>
 <body>
@@ -264,9 +276,12 @@
                     <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
                     <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
                     <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
+                
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton" class="action-button">Déconnexion</button>
         </aside>
 
         <main class="main-content">
@@ -479,6 +494,12 @@
         document.getElementById('mode-toggle').addEventListener('click', function() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('mode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
         });
 
         document.getElementById('menu-toggle').addEventListener('click', function() {

@@ -431,6 +431,33 @@
         .cancel-button:hover {
             background-color: #5a6268;
         }
+
+        .form-group {
+            position: relative;
+        }
+
+        .error {
+            border-bottom: 2px solid red;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+        }
+
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -440,22 +467,25 @@
             <h2>ARDeco Administration</h2>
             <nav>
                 <ul>
-                    <li><a href="/dashboard" id="dashboard-link"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-                    <li><a href="/users" id="users-link"><i class="fas fa-user"></i> Utilisateurs</a></li>
-                    <li><a href="/catalog" id="catalog-link"><i class="fas fa-book"></i> Catalogue</a></li>
-                    <li><a href="/statistics" id="statistics-link"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
-                    <li><a href="/changelog" id="changelog-link"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
-                    <li><a href="/suggestions" id="suggestions-link"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                    <li><a href="/dashboard"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                    <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
+                    <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                    <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                    <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
                     <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                    <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
+            <button id="logoutButton" class="action-button">Déconnexion</button>
         </aside>
 
         <main class="main-content">
             <section class="card">
                 <h2>Catalogue</h2>
                 <button id="filter-btn"><i class="fa-solid fa-filter"></i> Filtres</button>
+                <button id="add-btn">Ajouter un meuble</button>
                 <ul id="catalog"></ul>
             </section>
         </main>
@@ -481,6 +511,70 @@
                 <output>1000</output>€
             </div>
             <button onclick="filterCatalog()">Appliquer les Filtres</button>
+        </div>
+    </div>
+
+    <div id="add-popup" class="modal">
+        <div class="modal-content">
+            <h2>Ajouter un meuble</h2>
+            <form id="add-form">
+                <div class="form-row">
+                <div class="form-group">
+                        <label for="add-company-id">ID de l'entreprise :</label>
+                        <input type="text" id="add-company-id" name="company_id" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="add-name">Nom :</label>
+                        <input type="text" id="add-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-price">Prix :</label>
+                        <input type="number" id="add-price" name="price" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="add-height">Hauteur :</label>
+                        <input type="number" id="add-height" name="height" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-width">Largeur :</label>
+                        <input type="number" id="add-width" name="width" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="add-depth">Profondeur :</label>
+                        <input type="number" id="add-depth" name="depth" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-object-id">ID de l'objet :</label>
+                        <input type="text" id="add-object-id" name="object_id" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="add-company-name">Nom de l'entreprise :</label>
+                    <input type="text" id="add-company-name" name="company_name">
+                </div>
+                <div class="form-group">
+                    <label for="add-styles">Styles :</label>
+                    <div id="add-styles" class="tag-container"></div>
+                </div>
+                <div class="form-group">
+                    <label for="add-colors">Couleurs :</label>
+                    <div id="add-colors" class="tag-container"></div>
+                </div>
+                <div class="form-group">
+                    <label for="add-rooms">Pièces :</label>
+                    <div id="add-rooms" class="tag-container"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="sendNewProduct()">Ajouter</button>
+                    <button type="button" onclick="closeAddModal()" class="cancel-button">Annuler</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -626,6 +720,7 @@
                     officialValues = data.data;
                     populateEditFormOptions();
                     populateFilterOptions();
+                    populateAddFormOptions();
                 } else {
                     console.error('Erreur lors de la récupération des valeurs officielles:', data.description);
                 }
@@ -645,6 +740,12 @@
             createTags('style-filters', officialValues.styles);
             createTags('room-filters', officialValues.rooms);
             createTags('color-filters', officialValues.colors);
+        }
+
+        function populateAddFormOptions() {
+                createTags('add-styles', officialValues.styles);
+                createTags('add-rooms', officialValues.rooms);
+                createTags('add-colors', officialValues.colors);
         }
 
         function createTags(containerId, values) {
@@ -787,7 +888,6 @@
             setActiveTab();
             getCatalog();
             fetchOfficialValues();
-            document.querySelector('.close').addEventListener('click', closeModal);
         });
 
         if (localStorage.getItem('mode') === 'dark') {
@@ -806,6 +906,10 @@
 
         document.getElementById('filter-btn').addEventListener('click', function() {
             document.getElementById('filter-popup').style.display = 'block';
+        });
+
+        document.getElementById('add-btn').addEventListener('click', function() {
+            document.getElementById('add-popup').style.display = 'block';
         });
 
         document.querySelectorAll('.close').forEach(closeBtn => {
@@ -827,7 +931,12 @@
         function closeModal() {
             const modal = document.getElementById('edit-popup');
             modal.style.display = 'none';
-            document.getElementById('edit-form').reset();
+        }
+
+        function closeAddModal() {
+            const addmodal = document.getElementById('add-popup');
+            addmodal.style.display = 'none';
+            document.getElementById('add-form').reset();
         }
 
         document.querySelector('.close').addEventListener('click', closeModal);
@@ -838,6 +947,130 @@
                 closeModal();
             }
         }
+
+        function openAddModal() {
+            document.getElementById('add-popup').style.display = 'block';
+            document.getElementById('add-form').reset();
+        }
+
+        function sendNewProduct() {
+            const name = document.getElementById('add-name').value.trim();
+            const price = parseFloat(document.getElementById('add-price').value);
+            const height = parseFloat(document.getElementById('add-height').value);
+            const width = parseFloat(document.getElementById('add-width').value);
+            const depth = parseFloat(document.getElementById('add-depth').value);
+            const object_id = document.getElementById('add-object-id').value.trim();
+            const company_name = document.getElementById('add-company-name').value.trim();
+            const rooms = getSelectedTags('add-rooms');
+            const styles = getSelectedTags('add-styles');
+            const colors = getSelectedTags('add-colors').map(color => ({ color, model_id: 0 }));
+
+            const newProductData = [{}];
+            newProductData[0].name = name;
+            newProductData[0].price = price;
+            newProductData[0].height = height;
+            newProductData[0].width = width;
+            newProductData[0].depth = depth;
+            newProductData[0].object_id = object_id;
+            newProductData[0].company_name = company_name;
+            newProductData[0].colors = colors;
+            newProductData[0].rooms = rooms;
+            newProductData[0].styles = styles;
+
+            console.log(newProductData);
+
+
+            resetErrors();
+
+            let hasError = false;
+
+            if (!name) {
+                showError('add-name');
+                hasError = true;
+            }
+            if (!price) {
+                showError('add-price');
+                hasError = true;
+            }
+            if (!height) {
+                showError('add-height');
+                hasError = true;
+            }
+            if (!width) {
+                showError('add-width');
+                hasError = true;
+            }
+            if (!depth) {
+                showError('add-depth');
+                hasError = true;
+            }
+            if (!colors.length) {
+                showError('add-colors');
+                hasError = true;
+            }
+            if (!rooms.length) {
+                showError('add-rooms');
+                hasError = true;
+            }
+            if (!styles.length) {
+                showError('add-styles');
+                hasError = true;
+            }
+
+            if (hasError) {
+                return;
+            }
+
+        
+
+            const companyId = document.getElementById('add-company-id').value;
+
+            fetch(`https://api.ardeco.app/catalog/${companyId}/add/`, {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newProductData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Produit ajouté:', data);
+                if (data.status === 'OK') {
+                    closeAddModal();
+                    getCatalog();
+                } else {
+                    console.error('Erreur lors de l\'ajout du produit:', data.description);
+                }
+            })
+            .catch(error => console.error('Erreur lors de l\'ajout du produit:', error));
+        }
+
+        function showError(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.classList.add('error');
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'error-message';
+            errorMessage.textContent = 'Ce champ est requis.';
+            field.parentElement.appendChild(errorMessage);
+        }
+
+        function resetErrors() {
+            const fields = ['add-name', 'add-price', 'add-height', 'add-width', 'add-depth', 'add-colors', 'add-rooms', 'add-styles'];
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                field.classList.remove('error');
+                const errorMessage = field.parentElement.querySelector('.error-message');
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+            });
+        }
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            localStorage.removeItem("uid");
+            localStorage.removeItem("jwt"); 
+            window.location.href = "/"; 
+        });
     </script>
 </body>
 </html>

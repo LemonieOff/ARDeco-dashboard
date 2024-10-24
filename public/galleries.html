@@ -213,6 +213,10 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .gallery-item.reported {
+            border: 1px solid rgb(255, 89, 0);
+        }
     </style>
 </head>
 <body>
@@ -458,6 +462,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'OK' && data.data.length > 0) {
+                    galleryItem.classList.add('reported');
                     const viewReportsButton = document.createElement('button');
                     viewReportsButton.textContent = 'Voir signalements';
                     viewReportsButton.classList.add('gallery-button');

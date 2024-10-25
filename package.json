@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "start": "node monitoring.js",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:puppeteer": "jest --coverage"

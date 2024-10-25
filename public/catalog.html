@@ -478,7 +478,7 @@
                 </ul>
             </nav>
             <button id="mode-toggle">Changer de thème</button>
-            <button id="logoutButton" class="action-button">Déconnexion</button>
+            <button id="logoutButton" class="action-button" onclick="logout()">Déconnexion</button>
         </aside>
 
         <main class="main-content">
@@ -1105,11 +1105,13 @@
                 }
             });
         }
-        document.getElementById('logoutButton').addEventListener('click', function() {
+
+        function logout() {
+            console.log("logout");
             localStorage.removeItem("uid");
-            localStorage.removeItem("jwt"); 
-            window.location.href = "/"; 
-        });
+            localStorage.removeItem("jwt");
+            window.location.href = "/";
+        }
 
         function getUserRole() {
             if (localStorage.getItem("uid")) {

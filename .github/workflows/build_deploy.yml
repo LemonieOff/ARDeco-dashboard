@@ -21,9 +21,12 @@ jobs:
             ./ => /opt/ardeco/support
           ignore: |
             .git
+            .gitignore
             .github
             tests
+            coverage
             jest.config.js
+            package-lock.json
             README.md
 
       - name: Install dependencies on remote server

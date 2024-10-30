@@ -7,11 +7,11 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.0.1",
-    "puppeteer": "^22.11.2"
+    "express": "^5.0.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "supertest": "^6.3.4"
+    "supertest": "^6.3.4",
+    "puppeteer": "^22.15.0"
   }
 }

@@ -217,6 +217,114 @@
         .gallery-item.reported {
             border: 1px solid rgb(255, 89, 0);
         }
+
+        .filter-popup {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .filter-popup-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group h4 {
+            margin-bottom: 10px;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tag.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #filter-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .filter-popup-content button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .dark-mode .tag {
+            background-color: #2C3E50;
+            color: white;
+        }
+
+        .dark-mode .tag.selected {
+            background-color: var(--secondary-color);
+        }
+
+        .dark-mode .filter-popup-content {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .dark-mode .filter-group h4 {
+            color: var(--text-color);
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .dark-mode .filter-group select {
+            background-color: #2C3E50;
+            color: white;
+            border-color: #4a5568;
+        }
+
+        .dark-mode .filter-group select option {
+            background-color: #2C3E50;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -246,6 +354,28 @@
                 <div id="galleries-list"></div>
             </section>
         </main>
+    </div>
+
+    <div id="filter-popup" class="filter-popup">
+        <div class="filter-popup-content">
+            <div class="filter-group">
+                <h4>Style</h4>
+                <div id="style-filters" class="tag-container"></div>
+            </div>
+            <div class="filter-group">
+                <h4>Pièce</h4>
+                <div id="room-filters" class="tag-container"></div>
+            </div>
+            <div class="filter-group">
+                <h4>Signalements</h4>
+                <select id="reports-filter">
+                    <option value="">Tous</option>
+                    <option value="true">Avec signalements</option>
+                    <option value="false">Sans signalement</option>
+                </select>
+            </div>
+            <button onclick="applyFilters()">Appliquer les Filtres</button>
+        </div>
     </div>
 
     <div id="galleryModal" class="modal">
@@ -299,12 +429,15 @@
             });
         }
 
-        function displayGalleries(galleries) {
+        function displayGalleries(filteredGalleries) {
+            galleries = filteredGalleries;
             const galleriesList = document.getElementById('galleries-list');
             galleriesList.innerHTML = '';
-            galleries.forEach(gallery => {
+            
+            filteredGalleries.forEach(gallery => {
                 const galleryItem = document.createElement('div');
                 galleryItem.classList.add('gallery-item');
+                galleryItem.setAttribute('data-gallery-id', gallery.id);
                 galleryItem.innerHTML = `
                     <div class="gallery-header" onclick="toggleGallery(${gallery.id})">
                         <span class="gallery-title">ID: ${gallery.id} | Nom: ${gallery.name}</span>
@@ -630,6 +763,121 @@
             })
         }
 
+        let officialValues = {};
+        let allGalleries = [];
+
+        function getGalleries() {
+            fetch('https://api.ardeco.app/gallery', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    allGalleries = data.data;
+                    displayGalleries(allGalleries);
+                } else {
+                    console.error('Erreur lors de la récupération des galeries:', data.description);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération des galeries:', error);
+            });
+        }
+
+        function addFilterButton() {
+            const container = document.querySelector('.galleries-container h2');
+            const filterBtn = document.createElement('button');
+            filterBtn.id = 'filter-btn';
+            filterBtn.innerHTML = '<i class="fa-solid fa-filter"></i> Filtres';
+            filterBtn.onclick = () => document.getElementById('filter-popup').style.display = 'block';
+            container.insertAdjacentElement('afterend', filterBtn);
+        }
+
+        function fetchOfficialValues() {
+            fetch('https://api.ardeco.app/catalog/values', {
+                method: 'GET',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK' && data.code === 200) {
+                    officialValues = data.data;
+                    populateFilterOptions();
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+            });
+        }
+
+        function populateFilterOptions() {
+            createTags('style-filters', officialValues.styles);
+            createTags('room-filters', officialValues.rooms);
+        }
+
+        function createTags(containerId, values) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            values.forEach(value => {
+                const tag = document.createElement('div');
+                tag.classList.add('tag');
+                tag.textContent = value;
+                tag.onclick = function() {
+                    this.classList.toggle('selected');
+                };
+                container.appendChild(tag);
+            });
+        }
+
+        function getSelectedTags(containerId) {
+            return Array.from(document.querySelectorAll(`#${containerId} .tag.selected`))
+                .map(tag => tag.textContent);
+        }
+
+        function applyFilters() {
+            const selectedStyles = getSelectedTags('style-filters');
+            const selectedRooms = getSelectedTags('room-filters');
+            const reportsFilter = document.getElementById('reports-filter').value;
+            
+            const filteredGalleries = allGalleries.filter(gallery => {
+                const styleMatch = selectedStyles.length === 0 || selectedStyles.includes(gallery.style);
+                const roomMatch = selectedRooms.length === 0 || selectedRooms.includes(gallery.room);
+                
+                let reportsMatch = true;
+                if (reportsFilter !== "") {
+                    const galleryItem = document.querySelector(`[data-gallery-id="${gallery.id}"]`);
+                    const hasReports = galleryItem && galleryItem.classList.contains('reported');
+                    reportsMatch = reportsFilter === 'true' ? hasReports : !hasReports;
+                }
+                
+                return styleMatch && roomMatch && reportsMatch;
+            });
+            
+            displayGalleries(filteredGalleries);
+            document.getElementById('filter-popup').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveTab();
+            getGalleries();
+            getUserRole();
+            fetchOfficialValues();
+            addFilterButton();
+        });
+
+        window.onclick = function(event) {
+            const filterPopup = document.getElementById('filter-popup');
+            if (event.target === filterPopup) {
+                filterPopup.style.display = 'none';
+            }
+        };
     </script>
 </body>
 </html>

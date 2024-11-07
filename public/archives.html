@@ -184,6 +184,57 @@
                 margin-top: 50px;
             }
         }
+
+        .section-container {
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .section-header:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .section-header h3 {
+            margin: 0;
+            border: none;
+        }
+
+        .section-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .section-content {
+            padding: 10px;
+            background-color: var(--bg-color);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .object-item {
+            margin-top: 10px;
+        }
+
+        .object-item {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .dark-mode .section-header:hover {
+            background-color: var(--secondary-color);
+        }
     </style>
 </head>
 <body>
@@ -211,9 +262,7 @@
             <section class="card">
                 <h2>Archives</h2>
                 <div id="companies-list">
-                    <!-- Liste des entreprises sera générée ici -->
                 </div>
-
             </section>
         </main>
     </div>
@@ -273,9 +322,9 @@
                     detailsButton.addEventListener('click', () => {
                         const archivesList = document.getElementById(`archives-list-${company.id}`);
                         if (archivesList.style.display === 'block') {
-                            archivesList.style.display = 'none'; // Masquer les archives
+                            archivesList.style.display = 'none';
                         } else {
-                            fetchArchives(company.id, archivesList); // Récupérer et afficher les archives
+                            fetchArchives(company.id, archivesList);
                         }
                     });
                     companyHeader.appendChild(detailsButton);
@@ -295,73 +344,107 @@
         }
 
         function fetchArchives(companyId, archivesList) {
-            fetch(`https://api.ardeco.app/archive/${companyId}`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                archivesList.innerHTML = ''; // Réinitialiser la liste des archives
-                data.data.forEach(archive => {
-                    const archiveItem = document.createElement('div');
-                    archiveItem.textContent = `${archive.name} - Prix: ${archive.price}€`; // Afficher le nom et le prix
+            Promise.all([
+                fetch(`https://api.ardeco.app/archive/${companyId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(res => res.json()),
+                fetch(`https://api.ardeco.app/catalog/company/${companyId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(res => res.json())
+            ])
+            .then(([archivesData, catalogData]) => {
+                archivesList.innerHTML = '';
+
+                if (archivesData.status === 'OK') {
+                    const archivesSection = document.createElement('div');
+                    archivesSection.classList.add('section-container');
+                    archivesSection.innerHTML = `
+                        <div class="section-header" onclick="toggleSection('archives-content-${companyId}')">
+                            <h3>Archives (${archivesData.data.length} objets)</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="archives-content-${companyId}" class="section-content" style="display: none;">
+                        </div>
+                    `;
                     
-                    // Bouton pour restaurer
-                    const restoreButton = document.createElement('button');
-                    restoreButton.textContent = 'Restaurer';
-                    restoreButton.classList.add('changelog-button');
-                    restoreButton.addEventListener('click', () => {
-                        fetch(`https://api.ardeco.app/archive/restore/${companyId}/${archive.id}`, {
-                            method: 'PUT',
-                            credentials: 'include',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log('Restauré:', result);
-                            fetchArchives(companyId, archivesList); // Rafraîchir la liste après restauration
-                        })
-                        .catch(error => {
-                            console.error('Erreur lors de la restauration:', error);
-                        });
+                    const archivesContent = archivesSection.querySelector('.section-content');
+                    archivesData.data.forEach(archive => {
+                        const archiveItem = document.createElement('div');
+                        archiveItem.classList.add('object-item');
+                        archiveItem.innerHTML = `
+                            <div class="object-title">${archive.name}</div>
+                            <div class="object-details">
+                                <p>Prix: ${archive.price}€</p>
+                                <div class="action-buttons">
+                                    <button class="changelog-button" onclick="restoreArchive(${companyId}, ${archive.id})">
+                                        Restaurer
+                                    </button>
+                                    <button class="changelog-button delete" onclick="deleteArchive(${companyId}, ${archive.id})">
+                                        Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        archivesContent.appendChild(archiveItem);
                     });
-                    archiveItem.appendChild(restoreButton);
+                    archivesList.appendChild(archivesSection);
+                }
 
-                    // Bouton pour supprimer définitivement
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Supprimer';
-                    deleteButton.classList.add('changelog-button');
-                    deleteButton.addEventListener('click', () => {
-                        fetch(`https://api.ardeco.app/archive/${companyId}/${archive.id}`, {
-                            method: 'DELETE',
-                            credentials: 'include',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            console.log('Supprimé:', result);
-                            fetchArchives(companyId, archivesList); // Rafraîchir la liste après suppression
-                        })
-                        .catch(error => {
-                            console.error('Erreur lors de la suppression:', error);
-                        });
+                if (catalogData.status === 'OK') {
+                    const catalogSection = document.createElement('div');
+                    catalogSection.classList.add('section-container');
+                    catalogSection.innerHTML = `
+                        <div class="section-header" onclick="toggleSection('catalog-content-${companyId}')">
+                            <h3>Catalogue actif (${catalogData.data.length} objets)</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="catalog-content-${companyId}" class="section-content" style="display: none;">
+                        </div>
+                    `;
+                    
+                    const catalogContent = catalogSection.querySelector('.section-content');
+                    catalogData.data.forEach(product => {
+                        const productItem = document.createElement('div');
+                        productItem.classList.add('object-item');
+                        
+                        const colors = product.colors.map(c => c.color).join(', ');
+                        const rooms = Array.isArray(product.rooms) ? product.rooms.join(', ') : product.rooms;
+                        const styles = Array.isArray(product.styles) ? product.styles.join(', ') : product.styles;
+                        
+                        productItem.innerHTML = `
+                            <div class="object-title">${product.name}</div>
+                            <div class="object-details">
+                                <p>ID: ${product.object_id} | Prix: ${product.price}€</p>
+                                <p>Dimensions: ${product.width}x${product.height}x${product.depth} cm</p>
+                                <p>Couleurs: ${colors}</p>
+                                <p>Pièces: ${rooms}</p>
+                                <p>Styles: ${styles}</p>
+                                <p>Statut: ${product.active ? 'Actif' : 'Inactif'}</p>
+                            </div>
+                        `;
+                        catalogContent.appendChild(productItem);
                     });
-                    archiveItem.appendChild(deleteButton);
-
-                    archivesList.appendChild(archiveItem);
-                });
-                archivesList.style.display = 'block'; // Afficher la liste des archives
+                    archivesList.appendChild(catalogSection);
+                }
+                
+                archivesList.style.display = 'block';
             })
             .catch(error => {
                 console.error('ERROR:', error);
             });
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const isHidden = section.style.display === 'none';
+            section.style.display = isHidden ? 'block' : 'none';
+            
+            const icon = section.parentElement.querySelector('.fa-chevron-down');
+            icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0)';
         }
 
         function getUserRole() {

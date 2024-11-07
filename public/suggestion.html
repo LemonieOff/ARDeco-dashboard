@@ -279,6 +279,10 @@
                     <h3>Feedbacks</h3>
                     <div id="feedbacksList"></div>
                 </div>
+                <div class="feedback-container">
+                    <h3>Demandes traitées</h3>
+                    <div id="processedList"></div>
+                </div>
             </section>
         </main>
     </div>
@@ -312,6 +316,7 @@
                     feedbacks.suggestions = data.data.filter(item => item.type === "suggestion" && !item.processed);
                     feedbacks.bugs = data.data.filter(item => item.type === "bug" && !item.processed);
                     feedbacks.feedbacks = data.data.filter(item => item.type === "feedback" && !item.processed);
+                    feedbacks.processed = data.data.filter(item => item.processed);
                     console.log("Retours récupérés:", feedbacks);
                     renderFeedbacks();
                 } else {
@@ -327,6 +332,7 @@
             renderFeedbackType('suggestions', 'suggestionsList');
             renderFeedbackType('bugs', 'bugsList');
             renderFeedbackType('feedbacks', 'feedbacksList');
+            renderProcessedFeedbacks();
         }
 
         function renderFeedbackType(type, listId) {
@@ -344,6 +350,29 @@
                     <div id="content-${type}-${item.id}" class="feedback-content">
                         <p>${item.feedback}</p>
                         <button onclick="showFeedbackDetails('${type}', ${item.id})" class="feedback-button">Détail</button>
+                    </div>
+                `;
+                list.appendChild(feedbackItem);
+            });
+        }
+
+        function renderProcessedFeedbacks() {
+            const list = document.getElementById('processedList');
+            list.innerHTML = '';
+            feedbacks.processed.forEach(item => {
+                const feedbackItem = document.createElement('div');
+                feedbackItem.className = 'feedback-item';
+                const date = new Date(item.date).toLocaleDateString('fr-FR');
+                feedbackItem.innerHTML = `
+                    <div class="feedback-header" onclick="toggleFeedback('processed', ${item.id})">
+                        <span class="feedback-title">
+                            ID: ${item.id} | Type: ${item.type} | Utilisateur: ${item.user_id}
+                        </span>
+                        <span class="feedback-date">${date}</span>
+                    </div>
+                    <div id="content-processed-${item.id}" class="feedback-content">
+                        <p>${item.feedback}</p>
+                        <button onclick="showFeedbackDetails('processed', ${item.id})" class="feedback-button">Détail</button>
                     </div>
                 `;
                 list.appendChild(feedbackItem);

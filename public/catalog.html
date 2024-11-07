@@ -510,6 +510,14 @@
                 <input type="range" id="price-range" name="price" min="0" max="1000" value="1000" oninput="this.nextElementSibling.value = this.value">
                 <output>1000</output>€
             </div>
+            <div class="filter-group">
+                <h4>État</h4>
+                <select id="active-filter">
+                    <option value="">Tous</option>
+                    <option value="true">Actif</option>
+                    <option value="false">Inactif</option>
+                </select>
+            </div>
             <button onclick="filterCatalog()">Appliquer les Filtres</button>
         </div>
     </div>
@@ -664,7 +672,15 @@
         function displayCatalog(products) {
             const catalog = document.getElementById('catalog');
             catalog.innerHTML = '';
-            products.forEach(product => {
+            
+            const activeFilter = document.getElementById('active-filter').value;
+
+            const filteredProducts = products.filter(product => {
+                if (activeFilter === "") return true;
+                return product.active === (activeFilter === 'true');
+            });
+
+            filteredProducts.forEach(product => {
                 const productDiv = document.createElement('li');
                 productDiv.classList.add('product');
                 const styles = Array.isArray(product.styles) ? product.styles.join(', ') : product.styles;
@@ -682,7 +698,7 @@
                     <button onclick='openEditProduct(${JSON.stringify(product)})'>Edit</button>
                     <button style="background-color: #FF4D4D;" onclick="archiveProduct(${product.company}, ${product.id})">Archive</button>
                     <button style="background-color: #80669d;" onclick="changeVisibility(${product.company}, ${product.id}, ${product.active})">${product.active ? 'Hide' : 'Display'}</button>
-                    `;
+                `;
                 catalog.appendChild(productDiv);
             });
         }
@@ -692,12 +708,14 @@
             const colors = getSelectedTags('color-filters');
             const rooms = getSelectedTags('room-filters');
             const price = document.getElementById('price-range').value;
+            const active = document.getElementById('active-filter').value;
 
             const filters = {};
             if (styles.length > 0) filters.styles = styles;
             if (colors.length > 0) filters.colors = colors;
             if (rooms.length > 0) filters.rooms = rooms;
             if (price) filters.price = parseInt(price);
+            if (active) filters.active = active === 'true';
 
             getCatalog(filters);
         }

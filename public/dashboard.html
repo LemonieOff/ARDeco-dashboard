@@ -386,9 +386,35 @@
 
         function updateWeekStats(days) {
             const statsContainer = document.getElementById('week-stats');
-            statsContainer.innerHTML = Object.entries(days).map(([key, value]) => 
-                `<p>${key}: ${value} tickets créés</p>`
-            ).join('');
+            statsContainer.innerHTML = Object.entries(days).map(([key, value]) => {
+                let dateText;
+                switch(key) {
+                    case 'today':
+                        dateText = "Aujourd'hui";
+                        break;
+                    case 'yesterday':
+                        dateText = "Hier";
+                        break;
+                    case 'twoDaysAgo':
+                        dateText = "Il y a 2 jours";
+                        break;
+                    case 'threeDaysAgo':
+                        dateText = "Il y a 3 jours";
+                        break;
+                    case 'fourDaysAgo':
+                        dateText = "Il y a 4 jours";
+                        break;
+                    case 'fiveDaysAgo':
+                        dateText = "Il y a 5 jours";
+                        break;
+                    case 'sixDaysAgo':
+                        dateText = "Il y a 6 jours";
+                        break;
+                    default:
+                        dateText = key;
+                }
+                return `<p>${dateText}: ${value} ticket${value > 1 ? 's' : ''} créé${value > 1 ? 's' : ''}</p>`;
+            }).join('');
         }
 
         function fetchPendingTickets() {

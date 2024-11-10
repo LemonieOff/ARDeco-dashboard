@@ -376,14 +376,14 @@
                         const archiveItem = document.createElement('div');
                         archiveItem.classList.add('object-item');
                         archiveItem.innerHTML = `
-                            <div class="object-title">${archive.name}</div>
-                            <div class="object-details">
+                            <div class="titre-objet">${archive.name}</div>
+                            <div class="details-objet">
                                 <p>Prix: ${archive.price}€</p>
-                                <div class="action-buttons">
-                                    <button class="changelog-button" onclick="restoreArchive(${companyId}, ${archive.id})">
+                                <div class="boutons-action">
+                                    <button class="bouton-changelog" onclick="restaurerArchive(${companyId}, ${archive.id})">
                                         Restaurer
                                     </button>
-                                    <button class="changelog-button delete" onclick="deleteArchive(${companyId}, ${archive.id})">
+                                    <button class="bouton-changelog supprimer" onclick="supprimerArchive(${companyId}, ${archive.id})">
                                         Supprimer
                                     </button>
                                 </div>
@@ -488,6 +488,60 @@
                     }
                 }
             })
+        }
+
+        function restaurerArchive(idEntreprise, idObjet) {
+            if (confirm('Voulez-vous vraiment restaurer cet objet dans le catalogue ?')) {
+                fetch(`https://api.ardeco.app/archive/restore/${idEntreprise}/${idObjet}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(reponse => reponse.json())
+                .then(donnees => {
+                    if (donnees.status === 'OK' && donnees.code === 200) {
+                        alert('Objet restauré avec succès');
+                        // Rafraîchir la liste des archives
+                        const listeArchives = document.getElementById(`archives-list-${idEntreprise}`);
+                        fetchArchives(idEntreprise, listeArchives);
+                    } else {
+                        alert('Erreur lors de la restauration : ' + donnees.description);
+                    }
+                })
+                .catch(erreur => {
+                    console.error('ERREUR:', erreur);
+                    alert('Une erreur est survenue lors de la restauration');
+                });
+            }
+        }
+
+        function supprimerArchive(idEntreprise, idObjet) {
+            if (confirm('Voulez-vous vraiment supprimer définitivement cet objet ?')) {
+                fetch(`https://api.ardeco.app/archive/${idEntreprise}/${idObjet}`, {
+                    method: 'DELETE',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(reponse => reponse.json())
+                .then(donnees => {
+                    if (donnees.status === 'OK' && donnees.code === 200) {
+                        alert('Objet supprimé avec succès');
+                        // Rafraîchir la liste des archives
+                        const listeArchives = document.getElementById(`archives-list-${idEntreprise}`);
+                        fetchArchives(idEntreprise, listeArchives);
+                    } else {
+                        alert('Erreur lors de la suppression : ' + donnees.description);
+                    }
+                })
+                .catch(erreur => {
+                    console.error('ERREUR:', erreur);
+                    alert('Une erreur est survenue lors de la suppression');
+                });
+            }
         }
     </script>
 </body>

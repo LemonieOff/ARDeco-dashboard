@@ -303,8 +303,8 @@
                 <label for="versionNumber">Numéro de version:</label>
                 <input type="text" id="versionNumber" required>
                 
-                <label for="versionName">Nom de la version (optionnel):</label>
-                <input type="text" id="versionName">
+                <label for="versionName">Nom de la version:</label>
+                <input type="text" id="versionName" required>
                 
                 <label for="versionDate">Date de la version:</label>
                 <input type="date" id="versionDate" required>
@@ -399,10 +399,15 @@
         function saveVersion(event) {
             event.preventDefault();
             const isEdit = document.getElementById('modalTitle').textContent === 'Modifier la version';
-            const versionNumber = document.getElementById('versionNumber').value;
-            const versionName = document.getElementById('versionName').value;
+            const versionNumber = document.getElementById('versionNumber').value.trim();
+            const versionName = document.getElementById('versionName').value.trim();
             const versionDate = document.getElementById('versionDate').value;
-            const versionChanges = document.getElementById('versionChanges').value;
+            const versionChanges = document.getElementById('versionChanges').value.trim();
+
+            if (!versionNumber || !versionName || !versionDate || !versionChanges) {
+                alert('Tous les champs sont obligatoires');
+                return;
+            }
 
             if (isEdit) {
                 const editedVersionId = document.getElementById('versionForm').dataset.editId;

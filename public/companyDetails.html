@@ -6,368 +6,262 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
   <style>
 
-    ::-webkit-scrollbar {
-      width: 7px;
-    }
+:root {
+            --primary-color: #1BCFC4;
+            --secondary-color: #526ce3;
+            --text-color: #6A7482;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    ::-webkit-scrollbar-track {
-      background: rgba(241, 241, 241, 0.0);
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-    ::-webkit-scrollbar-thumb {
-      background: #6A7482;
-      border-radius: 5px;
-    }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: #58616c;
-    }
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            width: 250px;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
 
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
 
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
-    }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
 
-    header {
-      background-color: #526ce3;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
+        .sidebar li {
+            margin-bottom: 15px;
+        }
 
-    main {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr 1.5fr;
-      grid-template-rows: auto auto;
-      gap: 20px;
-      padding: 20px;
-    }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
 
-    .card {
-      background-color: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+        .sidebar i {
+            margin-right: 10px;
+        }
 
-    .full-height {
-      grid-row: 1 / -1;
-    }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
 
-    main > :nth-child(4) {
-      grid-column: 2 / span 2;
-      grid-row: 2;
-    }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
 
-    .full-height {
-      height: 90vh;
-      width: 45vh;
-    }
+        .user-info p {
+            margin: 10px 0;
+        }
 
-    .full-height2 {
-      grid-row: 1 / -1;
-    }
+        .user-info strong {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
 
-    .full-height2 {
-      height: 90.5vh;
-      width: 70vw;
-    }
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-    #open-tickets-list li:last-child {
-      border-bottom: none;
-    }
+        .action-button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            color: white;
+            text-align: center;
+        }
 
-    #categories {
-      padding: 0;
-      list-style-type: none;
-      margin: 20px;
-    }
+        #editButton { background-color: #1BCFC4; }
+        #closeAccount { background-color: #FE9496; }
+        #resetAPI { background-color: #526ce3; }
 
-    #categories li {
-      margin-bottom: 15px;
-      padding: 10px 15px;
-      color: #6A7482;
-      font-weight: bold;
-    }
+        .action-button:hover {
+            opacity: 0.8;
+        }
 
-    #categories li.selected {
-      background: #ECFFFE;
-      color: #6A7482;
-      box-shadow: 0 2px 4px rgba(151, 189, 189, 0.79);
-    }
+        #order-list {
+            list-style-type: none;
+            padding: 0;
+        }
 
-    a {
-      text-decoration: none;
-      color: #6A7482;
-    }
+        #order-list li {
+            background-color: var(--card-bg);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+        }
 
-    .message {
-      max-width: 50%;
-      word-wrap: break-word;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 10px;
-      background: #e1e9f5;
-      color: #6A7482;
-      width: 50%;
-    }
+        .dark-mode {
+            --bg-color: #18202D;
+            --card-bg: #1F2734;
+            --text-color: white;
+            --primary-color: #2C3E50;
+        }
 
+        #menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+        }
 
-    #userCard {
-      display: flex;
-      flex-direction: column;
-    }
+        #mode-toggle {
+            margin-top: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    .text-height {
-      height: 6vh;
-    }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
 
-    ul {
-      list-style-type: none;
-    }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                z-index: 1000;
+                width: 100%;
+                background-color: transparent;
+            }
 
-    .text-input-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-    }
+            .sidebar.active {
+                left: 0;
+                background-color: var(--primary-color);
+            }
 
-    #answer {
-      flex-grow: 1;
-      padding: 10px;
-      margin-right: 10px;
-      border: none;
-      border-bottom: 1px solid #ccc;
-      outline: none;
-    }
+            #menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+            }
 
-    .dark-mode #answer {
-      background: #1F2734;
-      color: white;
-    }
+            .main-content {
+                margin-top: 50px;
+            }
 
-    #answer:focus {
-      border-color: #1BCFC4;
-    }
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+        #logoutButton {
+            margin-top: 20px;
+            background-color: rgb(237, 115, 115);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
+        .status-indicator {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
 
-    #sendButton {
-      background-color: #FE9496;
-      color: white;
-      margin-right: 2%;
-    }
+        .status-active {
+            background-color: #4CAF50;
+            color: white;
+        }
 
-    #sendButton:hover {
-      background-color: #ea7e82;
-    }
-
-    #closeButton {
-      background-color: #1BCFC4;
-      color: white;
-      margin-right: 1%;
-    }
-
-    #deleteButton {
-      background: #9E58FF;
-      color: white;
-    }
-
-    #closeButton:hover {
-      background-color: #15a29a;
-    }
-
-    #deleteButton:hover {
-      background: #4d2c7c;
-    }
-
-
-    #messages-list {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      overflow: auto;
-      max-height: 80%;
-      padding: 10px;
-    }
-
-    .right {
-      align-self: flex-end;
-      background: #1BCFC4;
-      color: white;
-    }
-
-    .line {
-      width: 100%;
-      height: 1px;
-      background: #e1e9f5;
-      margin: 20px 0;
-    }
-
-    #theme-toggle {
-      background-color: #fff;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .dark-mode {
-      background: #18202D;
-      color: white;
-    }
-
-    .light-mode {
-      background-color: #f5f5f5;
-      color: black;
-    }
-
-    .dark-mode .card {
-      background-color: #1F2734;
-    }
-
-    .light-mode .card {
-      background-color: white;
-    }
-
-    .dark-mode #categories li.selected {
-      background-color: #18202D;
-      color: white;
-      box-shadow: none;
-    }
-
-    .dark-mode #open-tickets-list li {
-      background-color: #18202D;
-      box-shadow: none;
-    }
-
-    .dark-mode #open-tickets-list li a {
-      color: white;
-    }
-
-    .icon {
-      color: #1BCFC4;
-      background: #ffffff;
-    }
-
-    .iselected {
-      color: #ffffff;
-      background: #1BCFC4;
-    }
-
-    .dark-mode .icon {
-      color: #1F2734;
-      background: #1BCFC4;
-    }
-
-    #mode-toggle {
-      margin-top: 20%;
-      margin-left: 32%;
-      background-color: #9E58FF;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-
-    #mode-toggle:hover {
-      background-color: #4d2c7c;
-    }
-
-    #editButton {
-      margin-top: 10px;
-      background-color: #1BCFC4;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #editButton:hover {
-      background-color: #15a29a;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      box-sizing: border-box;
-    }
-
-    #logoutButton {
-      margin-top: 20px;
-      background-color: rgb(237, 115, 115);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
+        .status-deleted {
+            background-color: #f44336;
+            color: white;
+        }
 
   </style>
 </head>
 <body>
-<main>
-  <section class="card full-height">
-    <h2>ARDeco Administration tool</h2>
-    <div class="line"></div>
-    <ul id="categories">
-      <li><a href="/dashboard"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
-      <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
-      <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
-      <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
-      <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
-      <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
-      <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
-      <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
-    </ul>
-    <div class="line"></div>
-    <button id="mode-toggle">Theme switch</button>
-  </section>
-  <div id="userCard">
-    <section class="card full-height2">
-      <h2>company account details</h2>
-      <div id="info-list">
-        <p id="firstname">Firstname Placeholder</p>
-        <p id="lastname">Lastname Placeholder</p>
-        <p id="role">Role Placeholder</p>
-        <p id="mail">Mail: Placeholder</p>
-        <p id="phone">Phone: Placeholder</p>
-        <p id="address">City: Placeholder</p>
-        <h2>Company Archive</h2>
-        <ul id="archive-list">
-        </ul>
-        <button id="editButton">Edit</button>
-        <Button id="closeAccount">Close account</Button>
-        <button id="resetAPI">Reset API key</button>
-      </div>
-    </section>
-    <section class="card full-height2">
+<button id="menu-toggle"><i class="fas fa-bars"></i></button>
+<div class="container">
+    <aside class="sidebar">
+        <h2>ARDeco Administration</h2>
+        <nav>
+            <ul id="categories">
+                <li><a href="/dashboard"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                <li><a href="/users"><i class="fas fa-user"></i> Utilisateurs</a></li>
+                <li><a href="/catalog"><i class="fas fa-book"></i> Catalogue</a></li>
+                <li><a href="/statistics"><i class="fas fa-chart-bar"></i> Statistiques</a></li>
+                <li><a href="/changelog"><i class="fas fa-clipboard-list"></i> Changelog</a></li>
+                <li><a href="/suggestions"><i class="fas fa-lightbulb"></i> Suggestions</a></li>
+                <li><a href="/galleries"><i class="fas fa-images"></i> Galeries</a></li>
+                <li><a href="/archives"><i class="fas fa-archive"></i> Archives</a></li>
+            </ul>
+        </nav>
+        <button id="mode-toggle">Changer de thème</button>
+        <button id="logoutButton">Déconnexion</button>
+    </aside>
 
-    </section>
-  </div>
+    <main class="main-content">
+        <div id="userCard">
+            <section class="card full-height2">
+                <h2>company account details</h2>
+                <div id="info-list">
+                    <p id="firstname">Firstname Placeholder</p>
+                    <p id="lastname">Lastname Placeholder</p>
+                    <p id="role">Role Placeholder</p>
+                    <p id="mail">Mail: Placeholder</p>
+                    <p id="phone">Phone: Placeholder</p>
+                    <p id="address">City: Placeholder</p>
+                    
+                    <h2>Company Archive</h2>
+                    <ul id="archive-list"></ul>
+                    
+                    <div class="button-group">
+                        <button id="editButton" class="action-button">Modifier</button>
+                        <button id="closeAccount" class="action-button">Cloture le compte</button>
+                        <button id="resetAPI" class="action-button">Réinitialiser l'API</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
 
-
-</main>
-</body>
 <script>
+  var deleted = false;
   if (localStorage.getItem('mode') === 'dark') {
     document.body.classList.add('dark-mode');
   }
@@ -398,9 +292,10 @@
         document.getElementById('firstname').innerText = data.data.firstname.toUpperCase();
         document.getElementById('lastname').innerText = data.data.lastname.toUpperCase();
         document.getElementById('role').innerText = data.data.role;
-        document.getElementById('mail').innerText = "Mail : " + data.data.email;
-        document.getElementById('phone').innerText = "Phone : " + data.data.phone;
-        document.getElementById('address').innerText = "City : " + data.data.city;
+        document.getElementById('mail').innerText = "Email : " + data.data.email;
+        document.getElementById('phone').innerText = "Téléphone : " + data.data.phone;
+        document.getElementById('address').innerText = "Ville : " + data.data.city;
+        deleted = data.data.deleted;
       } else {
         alert('An error occurred while fetching user details');
       }
@@ -410,45 +305,62 @@
     });
   }
 
-
+  document.addEventListener('DOMContentLoaded', function() {
     getUser();
     getOrderHistory();
     getArchive();
+  });
 
   function getOrderHistory() {
-    fetch(`https://api.ardeco.app/order_history/user/${window.location.pathname.split('/').pop()}?mode=details`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-            .then(function (response) {
-              return response.json();
-            }).then(function (data) {
-      console.log(data);
-      if (data.status === 'OK') {
-        data.data.forEach(order => {
-          const orderList = document.getElementById('order-list');
-          const orderItem = document.createElement('li');
-          orderItem.innerText = `Order ID: ${order.id} - Date: ${new Date(order.datetime).toDateString()} - Total amount: ${order.total_amount}`;
-          orderList.appendChild(orderItem);
-          const furnitureList = document.createElement('ul');
-          order.furniture.forEach(furniture => {
-            const furnitureItem = document.createElement('li');
-            furnitureItem.innerText = `Furniture ID: ${furniture.id}`;
-            furnitureList.appendChild(furnitureItem);
-          });
-          orderList.appendChild(furnitureList);
-          console.log(order);
-        });
+    const orderList = document.getElementById('order-list');
+    if (!orderList) {
+        console.error('Element order-list not found');
+        return;
+    }
 
-      } else {
-        alert('An error occurred while fetching user details');
-      }
-    }).catch(error => {
-      console.error(error);
-      alert('An error occurred while fetching user details' + error);
+    fetch(`https://api.ardeco.app/order_history/user/${window.location.pathname.split('/').pop()}?mode=details`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'OK') {
+            orderList.innerHTML = '';
+            
+            if (!data.data || data.data.length === 0) {
+                orderList.innerHTML = '<li>Aucune commande trouvée</li>';
+                return;
+            }
+
+            data.data.forEach(order => {
+                const orderItem = document.createElement('li');
+                orderItem.innerHTML = `
+                    <strong>Commande ID:</strong> ${order.id}<br>
+                    <strong>Date:</strong> ${new Date(order.datetime).toLocaleDateString()}<br>
+                    <strong>Montant total:</strong> ${order.total_amount}€
+                `;
+                
+                if (order.furniture && order.furniture.length > 0) {
+                    const furnitureList = document.createElement('ul');
+                    order.furniture.forEach(furniture => {
+                        const furnitureItem = document.createElement('li');
+                        furnitureItem.innerText = `Meuble ID: ${furniture.id}`;
+                        furnitureList.appendChild(furnitureItem);
+                    });
+                    orderItem.appendChild(furnitureList);
+                }
+                
+                orderList.appendChild(orderItem);
+            });
+        } else {
+            console.error('Erreur lors de la récupération de l\'historique des commandes');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
     });
   }
 
@@ -525,28 +437,32 @@
   });
 
     document.getElementById('closeAccount').addEventListener('click', function () {
-        fetch(`https://api.ardeco.app/user/close/${window.location.pathname.split('/').pop()}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+      fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                deleted: !deleted
+            })
         })
-                .then(function (response) {
+            .then(function (response) {
                 return response.json();
-                }).then(function (data) {
-        console.log(data);
-        if (data.status === 'OK') {
-            alert('User account closed successfully');
-            window.location = '/';
-        } else {
-            alert('An error occurred while closing user account');
-        }
+            }).then(function (data) {
+            console.log(data);
+            if (data.status === 'OK') {
+                alert('User active status updated successfully');
+            } else {
+                alert('An error occurred while updating user active status');
+            }
         }).catch(error => {
-        console.error(error);
-        alert('An error occurred while closing user account' + error);
+            console.error(error);
+            alert('An error occurred while updating user active status' + error);
         });
     });
+
+
 
     document.getElementById('resetAPI').addEventListener('click', function () {
         fetch(`https://api.ardeco.app/company/resetToken?id=${window.location.pathname.split('/').pop()}`, {
@@ -572,23 +488,21 @@
     });
 
   function makeFieldsEditable() {
-    const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list
+    const fields = ['firstname', 'lastname', 'mail', 'phone', 'address'];
     fields.forEach(field => {
       const element = document.getElementById(field);
       const value = element.innerText.split(': ')[1] || element.innerText;
-      // Avoid creating input for 'role'
       element.innerHTML = `<input type="text" value="${value}" id="edit-${field}">`;
     });
   }
 
   function saveUserDetails() {
-    const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list
+    const fields = ['firstname', 'lastname', 'mail', 'phone', 'address'];
     let updatedUserDetails = {};
     fields.forEach(field => {
       const inputElement = document.getElementById(`edit-${field}`);
       if (inputElement) {
         const value = inputElement.value;
-        // Update the display without changing the role
         document.getElementById(field).innerText = `${field.charAt(0).toUpperCase() + field.slice(1)}: ${value}`;
         updatedUserDetails[field] = value;
       } else {
@@ -596,7 +510,6 @@
       }
     });
 
-    // Proceed with the fetch to update user details without including 'role'
     fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
       method: 'PUT',
       credentials: 'include',
@@ -606,7 +519,6 @@
       body: JSON.stringify({
         first_name: updatedUserDetails['firstname'],
         last_name: updatedUserDetails['lastname'],
-        // Do not update the role here
         email: updatedUserDetails['mail'],
         phone: updatedUserDetails['phone'],
         city: updatedUserDetails['address']
@@ -627,9 +539,10 @@
     });
   }
 
-
-
-
+  document.getElementById('menu-toggle').addEventListener('click', function() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('active');
+  });
 
 </script>
 </html>

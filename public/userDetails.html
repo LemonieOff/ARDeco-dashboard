@@ -2,7 +2,7 @@
 <head>
     <meta charSet="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARDeco user details</title>
+    <title>ARDeco détails utilisateur</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <style>
         :root {
@@ -194,6 +194,22 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .status-indicator {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .status-deleted {
+            background-color: #f44336;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -219,21 +235,22 @@
 
     <main class="main-content">
         <section class="card">
-            <h2>User details</h2>
+            <h2>Détails de l'utilisateur</h2>
             <div class="user-info">
-                <p><strong>Nom:</strong> <span id="firstname">T</span> <span id="lastname">T</span></p>
+                <p><strong>Nom:</strong> <span id="firstname"></span> <span id="lastname"></span></p>
                 <p><strong>Rôle:</strong> <span id="role">client</span></p>
-                <p><strong>Email:</strong> <span id="mail">caca@gmail.com</span></p>
-                <p><strong>Téléphone:</strong> <span id="phone">8921084094</span></p>
-                <p><strong>Ville:</strong> <span id="address">Berlin</span></p>
+                <p><strong>Statut:</strong> <span id="status" class="status-indicator"></span></p>
+                <p><strong>Email:</strong> <span id="mail"></span></p>
+                <p><strong>Téléphone:</strong> <span id="phone"></span></p>
+                <p><strong>Ville:</strong> <span id="address"></span></p>
             </div>
             <div class="button-group">
-                <button id="editButton" class="action-button">Edit</button>
-                <button id="changeRoleCompany" class="action-button">Change role to company</button>
-                <button id="changeRolePro" class="action-button">Change role to pro</button>
-                <button id="changeActiveStatus" class="action-button">Change active status</button>
+                <button id="editButton" class="action-button">Modifier</button>
+                <button id="changeRoleCompany" class="action-button">Changer le rôle en entreprise</button>
+                <button id="changeRolePro" class="action-button">Changer le rôle en professionnel</button>
+                <button id="changeActiveStatus" class="action-button">Changer le statut</button>
             </div>
-            <h3>Order List:</h3>
+            <h3>Historique des commandes :</h3>
             <ul id="order-list"></ul>
         </section>
     </main>
@@ -263,25 +280,31 @@
                 'Content-Type': 'application/json'
             }
         })
-            .then(function (response) {
-                return response.json();
-            }).then(function (data) {
-            console.log(data);
-            if (data.status === 'OK') {
-                document.getElementById('firstname').innerText = data.data.firstname.toUpperCase();
-                document.getElementById('lastname').innerText = data.data.lastname.toUpperCase();
-                document.getElementById('role').innerText = data.data.role;
-                deleted = data.data.deleted;
-                document.getElementById('mail').innerText = data.data.email;
-                document.getElementById('phone').innerText = data.data.phone;
-                document.getElementById('address').innerText = data.data.city;
-            } else {
-                alert('An error occurred while fetching user details');
-            }
-        }).catch(error => {
-            console.error(error);
-            alert('An error occurred while fetching user details' + error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    document.getElementById('firstname').innerText = data.data.firstname;
+                    document.getElementById('lastname').innerText = data.data.lastname;
+                    document.getElementById('role').innerText = data.data.role;
+                    deleted = data.data.deleted;
+                    
+                    const statusElement = document.getElementById('status');
+                    statusElement.innerText = deleted ? 'Supprimé' : 'Actif';
+                    statusElement.className = 'status-indicator ' + (deleted ? 'status-deleted' : 'status-active');
+                    
+                    const changeStatusButton = document.getElementById('changeActiveStatus');
+                    changeStatusButton.innerText = deleted ? 'Réactiver le compte' : 'Cloturer le compte';
+                    
+                    document.getElementById('mail').innerText = data.data.email;
+                    document.getElementById('phone').innerText = data.data.phone;
+                    document.getElementById('address').innerText = data.data.city;
+                } else {
+                    alert('Une erreur est survenue lors de la récupération des détails utilisateur');
+                }
+            }).catch(error => {
+                console.error(error);
+                alert('Une erreur est survenue lors de la récupération des détails utilisateur: ' + error);
+            });
     }
 
 
@@ -304,12 +327,12 @@
                 data.data.forEach(order => {
                     const orderList = document.getElementById('order-list');
                     const orderItem = document.createElement('li');
-                    orderItem.innerText = `Order ID: ${order.id} - Date: ${new Date(order.datetime).toDateString()} - Total amount: ${order.total_amount}`;
+                    orderItem.innerText = `Commande N° : ${order.id} - Date : ${new Date(order.datetime).toDateString()} - Montant total : ${order.total_amount}`;
                     orderList.appendChild(orderItem);
                     const furnitureList = document.createElement('ul');
                     order.furniture.forEach(furniture => {
                         const furnitureItem = document.createElement('li');
-                        furnitureItem.innerText = `Furniture ID: ${furniture.id}`;
+                        furnitureItem.innerText = `Meuble N° : ${furniture.id}`;
                         furnitureList.appendChild(furnitureItem);
                     });
                     orderList.appendChild(furnitureList);
@@ -366,10 +389,10 @@
         }).then(function(data) {
             console.log(data);
             if (data.status === 'OK') {
-                alert(`User role updated successfully to ${newRole}`);
+                alert(`Rôle de l'utilisateur mis à jour en ${newRole}`);
                 document.getElementById('role').innerText = newRole;
             } else {
-                alert('An error occurred while updating user role');
+                alert('Une erreur est survenue lors de la mise à jour du rôle');
             }
         }).catch(error => {
             console.error(error);
@@ -383,26 +406,33 @@
 
 
         function makeFieldsEditable() {
-        const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list
+        const fields = ['firstname', 'lastname', 'mail', 'phone', 'address'];
         fields.forEach(field => {
             const element = document.getElementById(field);
-            const value = element.innerText.split(': ')[1] || element.innerText;
-            // Avoid creating input for 'role'
-            element.innerHTML = `<input type="text" value="${value}" id="edit-${field}">`;
+            const value = element.innerText;
+            const required = field === 'firstname' || field === 'mail' ? 'required' : '';
+            element.innerHTML = `<input type="text" value="${value}" id="edit-${field}" ${required}>`;
         });
     }
 
     function saveUserDetails() {
-        const fields = ['firstname', 'lastname', 'mail', 'phone', 'address']; // Removed 'role' from the list
+        const fields = ['firstname', 'lastname', 'mail', 'phone', 'address'];
         let updatedUserDetails = {};
+        
+        const firstname = document.getElementById('edit-firstname').value.trim();
+        const email = document.getElementById('edit-mail').value.trim();
+        
+        if (!firstname || !email) {
+            alert('Le prénom et l\'email sont obligatoires');
+            return;
+        }
+        
         fields.forEach(field => {
             const inputElement = document.getElementById(`edit-${field}`);
             if (inputElement) {
-                const value = inputElement.value;
-                document.getElementById(field).innerText = `${field.charAt(0).toUpperCase() + field.slice(1)}: ${value}`;
+                const value = inputElement.value.trim();
+                document.getElementById(field).innerText = value;
                 updatedUserDetails[field] = value;
-            } else {
-                console.error(`Element for ${field} not found`);
             }
         });
 
@@ -420,18 +450,17 @@
                 city: updatedUserDetails['address']
             })
         })
-            .then(function (response) {
-                return response.json();
-            }).then(function (data) {
-            console.log(data);
+        .then(response => response.json())
+        .then(data => {
             if (data.status === 'OK') {
-                alert('User details updated successfully');
+                alert('Informations utilisateur mises à jour avec succès');
+                getUser();
             } else {
-                alert('An error occurred while updating user details');
+                alert('Une erreur est survenue lors de la mise à jour');
             }
         }).catch(error => {
             console.error(error);
-            alert('An error occurred while updating user details' + error);
+            alert('Une erreur est survenue lors de la mise à jour: ' + error);
         });
     }
 
@@ -451,9 +480,9 @@
             }).then(function (data) {
             console.log(data);
             if (data.status === 'OK') {
-                alert('User active status updated successfully');
+                alert('Statut de l\'utilisateur mis à jour avec succès');
             } else {
-                alert('An error occurred while updating user active status');
+                alert('Une erreur est survenue lors de la mise à jour du statut');
             }
         }).catch(error => {
             console.error(error);

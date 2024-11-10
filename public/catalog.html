@@ -683,6 +683,7 @@
             filteredProducts.forEach(product => {
                 const productDiv = document.createElement('li');
                 productDiv.classList.add('product');
+                productDiv.setAttribute('data-produit-id', product.id);
                 const styles = Array.isArray(product.styles) ? product.styles.join(', ') : product.styles;
                 const rooms = Array.isArray(product.rooms) ? product.rooms.join(', ') : product.rooms;
                 const colors = product.colors.map(c => c.color).join(', ');
@@ -694,10 +695,10 @@
                     <p>${rooms}</p>
                     <p>${colors}</p>
                     <p>${product.company}: ${product.company_name}</p>
-                    <p>${product.active ? 'Active' : 'Inactive'}</p>
-                    <button onclick='openEditProduct(${JSON.stringify(product)})'>Edit</button>
-                    <button style="background-color: #FF4D4D;" onclick="archiveProduct(${product.company}, ${product.id})">Archive</button>
-                    <button style="background-color: #80669d;" onclick="changeVisibility(${product.company}, ${product.id}, ${product.active})">${product.active ? 'Hide' : 'Display'}</button>
+                    <p>${product.active ? 'Actif' : 'Inactif'}</p>
+                    <button onclick='openEditProduct(${JSON.stringify(product)})'>Modifier</button>
+                    <button style="background-color: #FF4D4D;" onclick="archiverProduit(${product.company}, ${product.id})">Archiver</button>
+                    <button style="background-color: #80669d;" onclick="changeVisibility(${product.company}, ${product.id}, ${product.active})">${product.active ? 'Masquer' : 'Afficher'}</button>
                 `;
                 catalog.appendChild(productDiv);
             });
@@ -813,24 +814,29 @@
             });
         }
 
-        function archiveProduct(company, id) {
-            fetch(`https://api.ardeco.app/catalog/${company}/archive/${id}`, {
-                method: "DELETE",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Produit archivé:", data);
-                    if (data.status === "OK") {
-                        getCatalog(currentFilters);
-                    } else {
-                        console.error("Erreur lors de l'archivage:", data.description);
+        function archiverProduit(company, id) {
+            if (confirm('Voulez-vous vraiment archiver ce produit ?')) {
+                fetch(`https://api.ardeco.app/catalog/${company}/archive/${id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
                     }
                 })
-                .catch(error => console.error("Erreur lors de l'archivage:", error));
+                .then(reponse => reponse.json())
+                .then(donnees => {
+                    if (donnees.status === "OK") {
+                        const produit = document.querySelector(`[data-produit-id="${id}"]`);
+                        if (produit) {
+                            produit.remove();
+                        }
+                        alert('Produit archivé avec succès');
+                    } else {
+                        alert("Erreur lors de l'archivage : " + donnees.description);
+                    }
+                })
+                .catch(erreur => console.error("Erreur lors de l'archivage:", erreur));
+            }
         }
 
         function changeVisibility(company, id, currentVisibility) {

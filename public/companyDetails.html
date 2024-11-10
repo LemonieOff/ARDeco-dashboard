@@ -437,29 +437,28 @@
   });
 
     document.getElementById('closeAccount').addEventListener('click', function () {
-      fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                deleted: !deleted
+      if (confirm('Voulez-vous vraiment clôturer ce compte ?')) {
+            fetch(`https://api.ardeco.app/close/${window.location.pathname.split('/').pop()}`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
-        })
-            .then(function (response) {
-                return response.json();
-            }).then(function (data) {
-            console.log(data);
-            if (data.status === 'OK') {
-                alert('User active status updated successfully');
-            } else {
-                alert('An error occurred while updating user active status');
-            }
-        }).catch(error => {
-            console.error(error);
-            alert('An error occurred while updating user active status' + error);
-        });
+            .then(reponse => reponse.json())
+            .then(donnees => {
+                if (donnees.status === 'OK') {
+                    alert('Compte clôturé avec succès');
+                    window.location.href = '/users';
+                } else {
+                    alert('Erreur lors de la clôture du compte : ' + donnees.description);
+                }
+            })
+            .catch(erreur => {
+                console.error('ERREUR:', erreur);
+                alert('Une erreur est survenue lors de la clôture du compte');
+            });
+        }
     });
 
 

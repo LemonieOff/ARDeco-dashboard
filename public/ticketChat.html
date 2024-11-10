@@ -209,6 +209,25 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .card h2 {
+            margin-bottom: 20px;
+        }
+
+        .ticket-info {
+            border-bottom: 1px solid var(--text-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ticket-info p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .ticket-info i {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -289,9 +308,20 @@
             .then(function (response) {
                 return response.json();
             }).then(function (data) {
-                console.log(data);
                 if (data.status === 'OK') {
-                    console.log(data.data);
+                    const ticketInfo = document.querySelector('.card h2');
+                    ticketInfo.innerHTML = `
+                        <div class="ticket-info">
+                            <h2 style="margin: 0;">${data.data.title}</h2>
+                            <p style="margin: 5px 0; color: var(--text-color);">
+                                <i class="fas fa-user"></i> ${data.data.messages[0].sender}
+                            </p>
+                            <p style="margin: 10px 0; color: var(--text-color);">
+                                <i class="fas fa-info-circle"></i> ${data.data.description || 'Aucune description'}
+                            </p>
+                        </div>
+                    `;
+
                     let messages = data.data.messages;
                     const messagesContainer = document.querySelector('#messages-list');
                     let existingMessages = messagesContainer.children.length;
@@ -356,22 +386,41 @@
             let isBottom = document.querySelector('#messages-list').scrollHeight - document.querySelector('#messages-list').scrollTop === document.querySelector('#messages-list').clientHeight;
             let currentScroll = document.querySelector('#messages-list').scrollTop;
             const messagesContainer = document.querySelector('#messages-list');
-            // messagesContainer.innerHTML = ''; // Supprimer cette ligne pour éviter le clignotement
             getTicket(isBottom, currentScroll);
         }
 
         function closeTicket() {
-            fetch(`https://api.ardeco.app/ticket/close/${window.location.pathname.split('/').pop()}`, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'//,
-                }
-            }).then(response => response.json()).then(function () {
-                window.location.href = '/dashboard'
-            }).catch(error => {
-                console.error('Error:', error);
-            });
+            const messageContent = document.getElementById('answer').value;
+            const requestBody = messageContent.trim() ? { message: messageContent } : {};
+
+            const sendMessagePromise = messageContent.trim() 
+                ? fetch(`https://api.ardeco.app/ticket/write/${window.location.pathname.split('/').pop()}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                })
+                : Promise.resolve();
+
+            sendMessagePromise
+                .then(() => {
+                    return fetch(`https://api.ardeco.app/ticket/close/${window.location.pathname.split('/').pop()}`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                })
+                .then(response => response.json())
+                .then(() => {
+                    window.location.href = '/dashboard';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
 
         function deleteTicket() {

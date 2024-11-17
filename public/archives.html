@@ -235,6 +235,57 @@
         .dark-mode .section-header:hover {
             background-color: var(--secondary-color);
         }
+
+        #menu-toggle {
+                display: none;
+                background: none;
+                border: none;
+                color: var(--primary-color);
+                font-size: 24px;
+                cursor: pointer;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                z-index: 1000;
+                width: 100%;
+                background-color: transparent;
+            }
+
+            .sidebar.active {
+                left: 0;
+                background-color: var(--primary-color);
+            }
+
+            #menu-toggle {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+            }
+
+            .main-content {
+                margin-top: 50px;
+            }
+        }
+
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -291,7 +342,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             fetchCompanies();
             getUserRole();
+            setActiveTab();
         });
+
+        function setActiveTab() {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        }
 
         function fetchCompanies() {
             fetch('https://api.ardeco.app/user/companies', {
@@ -503,7 +565,6 @@
                 .then(donnees => {
                     if (donnees.status === 'OK' && donnees.code === 200) {
                         alert('Objet restauré avec succès');
-                        // Rafraîchir la liste des archives
                         const listeArchives = document.getElementById(`archives-list-${idEntreprise}`);
                         fetchArchives(idEntreprise, listeArchives);
                     } else {
@@ -530,7 +591,6 @@
                 .then(donnees => {
                     if (donnees.status === 'OK' && donnees.code === 200) {
                         alert('Objet supprimé avec succès');
-                        // Rafraîchir la liste des archives
                         const listeArchives = document.getElementById(`archives-list-${idEntreprise}`);
                         fetchArchives(idEntreprise, listeArchives);
                     } else {

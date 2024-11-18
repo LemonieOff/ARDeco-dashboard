@@ -221,6 +221,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -276,17 +281,9 @@
             localStorage.setItem('mode', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
             updateWeekChartGradient();
         });
-
         document.getElementById('menu-toggle').addEventListener('click', function() {
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('active');
-            if (sidebar.classList.contains('active')) {
-                sidebar.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
-            } else {
-                setTimeout(() => {
-                    sidebar.style.backgroundColor = 'transparent';
-                }, 300);
-            }
         });
 
 
@@ -458,7 +455,18 @@
             fetchTicketStats();
             fetchWeeklyStats();
             fetchPendingTickets();
+            setActiveTab();
         });
+
+        function setActiveTab() {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === '#' && currentPath === '/dashboard') {
+                    link.classList.add('active');
+                }
+            });
+        }
 
         document.getElementById('logoutButton').addEventListener('click', function() {
             localStorage.removeItem("uid");

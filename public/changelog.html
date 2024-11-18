@@ -259,7 +259,10 @@
             }
         }
 
-        
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -513,9 +516,19 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            //wait 1 second before checking JWT
             setTimeout(getUserRole, 500);
+            setActiveTab();
         });
+
+        function setActiveTab() {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        }
 
         function getUserRole() {
             if (localStorage.getItem("uid")) {

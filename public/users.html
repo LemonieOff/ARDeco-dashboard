@@ -414,6 +414,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -512,7 +517,19 @@
             .catch(error => {
                 console.error('ERROR:', error);
             });
+        getUserRole();
+        setActiveTab();
     });
+
+    function setActiveTab() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.sidebar a');
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    }
 
     document.getElementById('searchInput').addEventListener('keyup', function() {
         var searchValue = this.value.toLowerCase();
@@ -561,10 +578,6 @@
     document.getElementById('menu-toggle').addEventListener('click', function() {
         const sidebar = document.querySelector('.sidebar');
         sidebar.classList.toggle('active');
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        getUserRole();
     });
 
     document.getElementById('logoutButton').addEventListener('click', function() {

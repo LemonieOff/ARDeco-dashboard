@@ -228,6 +228,11 @@
         .ticket-info i {
             margin-right: 5px;
         }
+
+        .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -295,7 +300,18 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             getUserRole();
+            setActiveTab();
         });
+
+        function setActiveTab() {
+            const currentPath = '/dashboard';
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        }
 
         function getTicket(isBottom, currentScroll) {
             fetch(`https://api.ardeco.app/ticket/${window.location.pathname.split('/').pop()}`, {

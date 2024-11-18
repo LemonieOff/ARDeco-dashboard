@@ -527,9 +527,11 @@
             <h2>Ajouter un meuble</h2>
             <form id="add-form">
                 <div class="form-row">
-                <div class="form-group">
-                        <label for="add-company-id">ID de l'entreprise :</label>
-                        <input type="text" id="add-company-id" name="company_id" required>
+                    <div class="form-group">
+                        <label for="add-company-id">Entreprise :</label>
+                        <select id="add-company-id" name="company_id" required>
+                            <option value="">Sélectionner une entreprise</option>
+                        </select>
                     </div>
                 </div>
                 <div class="form-row">
@@ -780,12 +782,14 @@
                 let colorLabel;
                 if (isColor) {
                     modelIdInput = document.createElement('input');
-                    modelIdInput.type = 'text';
+                    modelIdInput.type = 'number';
                     modelIdInput.id = `model-id-${value}`;
-                    modelIdInput.placeholder = 'ID du modèle';
+                    modelIdInput.min = 1;
+                    modelIdInput.max = 100;
+                    modelIdInput.placeholder = 'ID du modèle (1-100)';
 
                     colorLabel = document.createElement('label');
-                    colorLabel.textContent = `ID du modèle pour ${value} :`;
+                    colorLabel.textContent = `ID du modèle pour ${value} (1-100) :`;
                     colorLabel.htmlFor = modelIdInput.id;
                 }
 
@@ -935,11 +939,33 @@
             });
         }
 
+        function populateCompanySelect() {
+            fetch('https://api.ardeco.app/user/companies', {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    const select = document.getElementById('add-company-id');
+                    data.data.forEach(company => {
+                        const option = document.createElement('option');
+                        option.value = company.id;
+                        option.textContent = `${company.id} - ${company.first_name} ${company.last_name} `;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => console.error('Erreur lors de la récupération des entreprises:', error));
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             setActiveTab();
             getUserRole();
             getCatalog();
             fetchOfficialValues();
+            populateCompanySelect();
         });
 
         if (localStorage.getItem('mode') === 'dark') {

@@ -357,7 +357,20 @@
                             let date = new Date(timestamp);
                             dateText.innerHTML = date.toLocaleString();
 
-                            message.innerHTML = messages[i].sender + ":" + '<br>' + messages[i].content + '<br><br>' + date.toLocaleString();
+                            const sender_elem = document.createElement('span');
+                            sender_elem.style.fontWeight = 'bold';
+                            sender_elem.innerHTML = messages[i].sender + ":" + "<br>";
+                            message.appendChild(sender_elem);
+
+                            const message_elem = document.createElement('p');
+                            message_elem.innerHTML = messages[i].content.replaceAll(/\n/g, "<br />");
+                            message.appendChild(message_elem);
+
+                            dateText.style.fontStyle = 'italic';
+                            dateText.style.textAlign = 'right';
+                            message.appendChild(dateText);
+
+                            // message.innerHTML = messages[i].sender + ":" + '<br>' + messages[i].content.replaceAll(/\n/g, "<br />") + '<br><br>' + date.toLocaleString();
                             messagesContainer.appendChild(message);
                         }
                     }

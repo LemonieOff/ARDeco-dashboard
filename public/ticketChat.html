@@ -35,6 +35,7 @@
             padding: 20px;
             width: 250px;
             transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+            position: relative;
         }
 
         .sidebar h2 {
@@ -232,6 +233,34 @@
         .sidebar a.active {
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
+            padding: 8px;
+        }
+
+        #close-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 30px;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            #close-menu {
+                display: none;
+            }
+
+            .sidebar.active #close-menu {
+                display: block;
+            }
+
+            .sidebar.active #menu-toggle {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -239,6 +268,7 @@
     <button id="menu-toggle"><i class="fas fa-bars"></i></button>
     <div class="container">
         <aside class="sidebar">
+            <button id="close-menu"><i class="fas fa-times"></i></button>
             <h2>ARDeco Administration</h2>
             <nav>
                 <ul>
@@ -304,14 +334,32 @@
         });
 
         function setActiveTab() {
-            const currentPath = '/dashboard';
+            const currentPath = window.location.pathname;
+            const sidebar = document.querySelector('.sidebar');
             const links = document.querySelectorAll('.sidebar a');
+            
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
+                if (link.getAttribute('href') === currentPath && (window.innerWidth > 768 || sidebar.classList.contains('active'))) {
                     link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
                 }
             });
         }
+
+        document.getElementById('close-menu').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.remove('active');
+            
+            document.getElementById('menu-toggle').style.display = 'block';
+            
+            if (!sidebar.classList.contains('active')) {
+                const activeLinks = document.querySelectorAll('.sidebar a.active');
+                activeLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+            }
+        });
 
         function getTicket(isBottom, currentScroll) {
             fetch(`https://api.ardeco.app/ticket/${window.location.pathname.split('/').pop()}`, {

@@ -33,11 +33,6 @@ app.get('/user/:userId', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/userDetails.html'));
 });
 
-app.get('/company/:companyId', (req, res) => {
-    const companyId = req.params.company
-    res.sendFile(path.join(__dirname, 'public/companyDetails.html'));
-});
-
 app.get('/catalog', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/catalog.html'));
 });

@@ -458,12 +458,60 @@
             cursor: pointer;
         }
 
+        .color-input-group {
+            margin: 10px 0;
+            padding: 5px;
+            border-radius: 4px;
+            background-color: var(--bg-color);
+        }
+        
+        .color-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        
+        .color-input-group input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid var(--text-color);
+            border-radius: 4px;
+        }
+
+        #close-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            #close-menu {
+                display: none;
+            }
+
+            .sidebar.active #close-menu {
+                display: block;
+            }
+
+            .sidebar.active #menu-toggle {
+                display: none;
+            }
+        }
+
     </style>
 </head>
 <body>
     <button id="menu-toggle"><i class="fas fa-bars"></i></button>
     <div class="container">
         <aside class="sidebar">
+            <button id="close-menu"><i class="fas fa-times"></i></button>
             <h2>ARDeco Administration</h2>
             <nav>
                 <ul>
@@ -782,34 +830,40 @@ ${!product.archived ? `
                 const tag = document.createElement('div');
                 tag.classList.add('tag');
                 tag.textContent = value;
-
-                let modelIdInput;
-                let colorLabel;
-                if (isColor) {
-                    modelIdInput = document.createElement('input');
-                    modelIdInput.type = 'number';
-                    modelIdInput.id = `model-id-${value}`;
-                    modelIdInput.min = 1;
-                    modelIdInput.max = 100;
-                    modelIdInput.placeholder = 'ID du modèle (1-100)';
-
-                    colorLabel = document.createElement('label');
-                    colorLabel.textContent = `ID du modèle pour ${value} (1-100) :`;
-                    colorLabel.htmlFor = modelIdInput.id;
-                }
+                tag.setAttribute('data-color', value);
 
                 tag.onclick = function() {
                     this.classList.toggle('selected');
-                    if (this.classList.contains('selected')) {
-                        if (isColor) {
-                            const colorInputContainer = document.getElementById('color-inputs');
-                            colorInputContainer.appendChild(colorLabel);
-                            colorInputContainer.appendChild(modelIdInput);
-                        }
-                    } else {
-                        if (isColor) {
-                            colorLabel.remove();
-                            modelIdInput.remove();
+                    
+                    if (isColor) {
+                        const colorInputContainer = document.getElementById(`${containerId}-inputs`) || 
+                                                 document.getElementById('color-inputs');
+                        const existingInput = document.getElementById(`${containerId}-model-id-${value}`);
+                        
+                        if (this.classList.contains('selected') && !existingInput) {
+                            const inputGroup = document.createElement('div');
+                            inputGroup.className = 'color-input-group';
+                            inputGroup.id = `${containerId}-group-${value}`;
+                            
+                            const modelIdInput = document.createElement('input');
+                            modelIdInput.type = 'number';
+                            modelIdInput.id = `${containerId}-model-id-${value}`;
+                            modelIdInput.min = 1;
+                            modelIdInput.max = 100;
+                            modelIdInput.placeholder = 'ID du modèle (1-100)';
+
+                            const colorLabel = document.createElement('label');
+                            colorLabel.textContent = `ID du modèle pour ${value} (1-100) :`;
+                            colorLabel.htmlFor = modelIdInput.id;
+
+                            inputGroup.appendChild(colorLabel);
+                            inputGroup.appendChild(modelIdInput);
+                            colorInputContainer.appendChild(inputGroup);
+                        } else if (!this.classList.contains('selected')) {
+                            const inputGroup = document.getElementById(`${containerId}-group-${value}`);
+                            if (inputGroup) {
+                                inputGroup.remove();
+                            }
                         }
                     }
                 };
@@ -882,34 +936,164 @@ ${!product.archived ? `
             document.getElementById('edit-object-id').value = product.object_id;
             document.getElementById('edit-company-name').value = product.company_name;
 
+            let colorInputContainer = document.getElementById('edit-color-inputs');
+            if (!colorInputContainer) {
+                colorInputContainer = document.createElement('div');
+                colorInputContainer.id = 'edit-color-inputs';
+                document.getElementById('edit-colors').parentElement.appendChild(colorInputContainer);
+            }
+
             selectTags('edit-styles', product.styles);
             selectTags('edit-rooms', product.rooms);
-            selectTags('edit-colors', product.colors.map(c => c.color));
+            
+            const colorTags = document.querySelectorAll('#edit-colors .tag');
+            colorTags.forEach(tag => {
+                const color = tag.getAttribute('data-color');
+                tag.onclick = function() {
+                    this.classList.toggle('selected');
+                    
+                    if (this.classList.contains('selected')) {
+                        const modelId = product.colors.find(c => c.color === color)?.model_id || '';
+                        
+                        const inputGroup = document.createElement('div');
+                        inputGroup.className = 'color-input-group';
+                        inputGroup.id = `edit-group-${color}`;
+                        
+                        const modelIdInput = document.createElement('input');
+                        modelIdInput.type = 'number';
+                        modelIdInput.id = `edit-model-id-${color}`;
+                        modelIdInput.value = modelId;
+                        modelIdInput.min = 1;
+                        modelIdInput.max = 100;
+                        modelIdInput.placeholder = 'ID du modèle (1-100)';
+
+                        const colorLabel = document.createElement('label');
+                        colorLabel.textContent = `ID du modèle pour ${color} (1-100) :`;
+                        colorLabel.htmlFor = modelIdInput.id;
+
+                        inputGroup.appendChild(colorLabel);
+                        inputGroup.appendChild(modelIdInput);
+                        colorInputContainer.appendChild(inputGroup);
+                    } else {
+                        const inputGroup = document.getElementById(`edit-group-${color}`);
+                        if (inputGroup) {
+                            inputGroup.remove();
+                        }
+                    }
+                };
+                const existingColor = product.colors.find(c => c.color === color);
+                if (existingColor) {
+                    tag.classList.add('selected');
+                    
+                    const inputGroup = document.createElement('div');
+                    inputGroup.className = 'color-input-group';
+                    inputGroup.id = `edit-group-${color}`;
+                    
+                    const modelIdInput = document.createElement('input');
+                    modelIdInput.type = 'number';
+                    modelIdInput.id = `edit-model-id-${color}`;
+                    modelIdInput.value = existingColor.model_id;
+                    modelIdInput.min = 1;
+                    modelIdInput.max = 100;
+                    modelIdInput.placeholder = 'ID du modèle (1-100)';
+
+                    const colorLabel = document.createElement('label');
+                    colorLabel.textContent = `ID du modèle pour ${color} (1-100) :`;
+                    colorLabel.htmlFor = modelIdInput.id;
+
+                    inputGroup.appendChild(colorLabel);
+                    inputGroup.appendChild(modelIdInput);
+                    colorInputContainer.appendChild(inputGroup);
+                }
+            });
         }
 
         function sendEditedProduct() {
-            const name = document.getElementById('edit-name').value;
+            const name = document.getElementById('edit-name').value.trim();
             const price = parseFloat(document.getElementById('edit-price').value);
             const height = parseFloat(document.getElementById('edit-height').value);
             const width = parseFloat(document.getElementById('edit-width').value);
             const depth = parseFloat(document.getElementById('edit-depth').value);
+            const object_id = document.getElementById('edit-object-id').value.trim();
+            const company_name = document.getElementById('edit-company-name').value.trim();
             const styles = getSelectedTags('edit-styles');
             const rooms = getSelectedTags('edit-rooms');
-            const colors = getSelectedTags('edit-colors').map(color => ({ color, model_id: 0 }));
-            const object_id = document.getElementById('edit-object-id').value;
-            const company_name = document.getElementById('edit-company-name').value;
+            
+            resetErrors();
+            
+            let hasError = false;
 
-            const editedData = {};
-            if (name) editedData.name = name;
-            if (!isNaN(price)) editedData.price = price;
-            if (!isNaN(height)) editedData.height = height;
-            if (!isNaN(width)) editedData.width = width;
-            if (!isNaN(depth)) editedData.depth = depth;
-            if (styles.length > 0) editedData.styles = styles;
-            if (rooms.length > 0) editedData.rooms = rooms;
-            if (colors.length > 0) editedData.colors = colors;
-            if (object_id) editedData.object_id = object_id;
-            if (company_name) editedData.company_name = company_name;
+            if (!name) {
+                showError('edit-name', 'Le nom est requis');
+                hasError = true;
+            }
+            if (!price || isNaN(price)) {
+                showError('edit-price', 'Le prix est requis et doit être un nombre');
+                hasError = true;
+            }
+            if (!height || isNaN(height)) {
+                showError('edit-height', 'La hauteur est requise et doit être un nombre');
+                hasError = true;
+            }
+            if (!width || isNaN(width)) {
+                showError('edit-width', 'La largeur est requise et doit être un nombre');
+                hasError = true;
+            }
+            if (!depth || isNaN(depth)) {
+                showError('edit-depth', 'La profondeur est requise et doit être un nombre');
+                hasError = true;
+            }
+            if (!object_id) {
+                showError('edit-object-id', 'L\'ID de l\'objet est requis');
+                hasError = true;
+            }
+            if (!company_name) {
+                showError('edit-company-name', 'Le nom de l\'entreprise est requis');
+                hasError = true;
+            }
+            if (styles.length === 0) {
+                showError('edit-styles', 'Au moins un style doit être sélectionné');
+                hasError = true;
+            }
+            if (rooms.length === 0) {
+                showError('edit-rooms', 'Au moins une pièce doit être sélectionnée');
+                hasError = true;
+            }
+
+            const colors = getSelectedTags('edit-colors').map(color => {
+                const modelIdInput = document.getElementById(`edit-model-id-${color}`);
+                const modelId = parseInt(modelIdInput ? modelIdInput.value : '');
+                
+                if (isNaN(modelId) || modelId < 1 || modelId > 100) {
+                    showError(`edit-model-id-${color}`, 'L\'ID du modèle doit être un nombre entre 1 et 100');
+                    hasError = true;
+                    return null;
+                }
+                
+                return { color, model_id: modelId };
+            }).filter(color => color !== null);
+
+            if (colors.length === 0) {
+                showError('edit-colors', 'Au moins une couleur doit être sélectionnée');
+                hasError = true;
+            }
+
+            if (hasError) {
+                return;
+            }
+
+            const editedData = {
+                name,
+                price,
+                height,
+                width,
+                depth,
+                object_id,
+                company_name,
+                styles,
+                rooms,
+                colors
+            };
 
             fetch(`https://api.ardeco.app/catalog/${companyEdit}/edit/${idEdit}`, {
                 method: 'PUT',
@@ -921,22 +1105,35 @@ ${!product.archived ? `
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Produit modifié:', data);
                 if (data.status === 'OK') {
-                    document.getElementById('edit-popup').style.display = "none";
+                    closeModal();
                     getCatalog(currentFilters);
                 } else {
                     console.error('Erreur lors de la modification:', data.description);
+                    showError('edit-form', data.description);
                 }
             })
-            .catch(error => console.error('Erreur lors de la modification:', error));
+            .catch(error => {
+                console.error('Erreur lors de la modification:', error);
+                showError('edit-form', 'Une erreur est survenue lors de la modification');
+            });
+        }
+
+        function resetErrors() {
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => error.remove());
+
+            const errorFields = document.querySelectorAll('.error');
+            errorFields.forEach(field => field.classList.remove('error'));
         }
 
         function setActiveTab() {
             const currentPath = window.location.pathname;
+            const sidebar = document.querySelector('.sidebar');
             const links = document.querySelectorAll('.sidebar a');
+            
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
+                if (link.getAttribute('href') === currentPath && (window.innerWidth > 768 || sidebar.classList.contains('active'))) {
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
@@ -1014,20 +1211,59 @@ ${!product.archived ? `
         function closeModal() {
             const modal = document.getElementById('edit-popup');
             modal.style.display = 'none';
+            
+            document.getElementById('edit-form').reset();
+            
+            resetTags('edit-styles');
+            resetTags('edit-rooms');
+            resetTags('edit-colors');
+            
+            const colorInputContainer = document.getElementById('edit-color-inputs');
+            if (colorInputContainer) {
+                colorInputContainer.innerHTML = '';
+            }
+
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => error.remove());
+
+            const errorFields = document.querySelectorAll('.error');
+            errorFields.forEach(field => field.classList.remove('error'));
         }
 
         function closeAddModal() {
-            const addmodal = document.getElementById('add-popup');
+            const addmodal = document.getElementById('add-popup');  
             addmodal.style.display = 'none';
+            
             document.getElementById('add-form').reset();
+            
+            resetTags('add-styles');
+            resetTags('add-rooms');
+            resetTags('add-colors');
+            
+            const colorInputContainer = document.getElementById('color-inputs');
+            if (colorInputContainer) {
+                colorInputContainer.innerHTML = '';
+            }
         }
 
-        document.querySelector('.close').addEventListener('click', closeModal);
+        function resetTags(containerId) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                const tags = container.querySelectorAll('.tag');
+                tags.forEach(tag => {
+                    tag.classList.remove('selected');
+                });
+            }
+        }
 
         window.onclick = function(event) {
-            const modal = document.getElementById('edit-popup');
-            if (event.target == modal) {
+            const editModal = document.getElementById('edit-popup');
+            const addModal = document.getElementById('add-popup');
+            
+            if (event.target == editModal) {
                 closeModal();
+            } else if (event.target == addModal) {
+                closeAddModal();
             }
         }
 
@@ -1050,9 +1286,20 @@ ${!product.archived ? `
 
             const colors = getSelectedTags('add-colors').map((color) => {
                 const modelIdInput = document.getElementById(`model-id-${color}`);
-                const modelId = modelIdInput ? modelIdInput.value : '';
+                const modelId = parseInt(modelIdInput ? modelIdInput.value : '');
+                
+                if (isNaN(modelId) || modelId < 1 || modelId > 100) {
+                    showError(`model-id-${color}`, 'L\'ID du modèle doit être un nombre entre 1 et 100');
+                    hasError = true;
+                    return null;
+                }
+                
                 return { color, model_id: modelId };
             });
+
+            if (colors.includes(null)) {
+                return;
+            }
 
             const newProductData = [{}];
             newProductData[0].name = name;
@@ -1140,12 +1387,20 @@ ${!product.archived ? `
             .catch(error => console.error('Erreur lors de l\'ajout du produit:', error));
         }
 
-        function showError(fieldId) {
+        function showError(fieldId, message = 'Ce champ est requis.') {
             const field = document.getElementById(fieldId);
+            if (!field) return; 
+            
             field.classList.add('error');
+            
+            const existingError = field.parentElement.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
             const errorMessage = document.createElement('div');
             errorMessage.className = 'error-message';
-            errorMessage.textContent = 'Ce champ est requis.';
+            errorMessage.textContent = message;
             field.parentElement.appendChild(errorMessage);
         }
 
@@ -1210,6 +1465,22 @@ ${!product.archived ? `
                 }
             })
         }
+
+        document.getElementById('close-menu').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.remove('active');
+            
+            // Réactive le bouton du menu
+            document.getElementById('menu-toggle').style.display = 'block';
+            
+            // Désactive l'indicateur sélectionné si le menu est fermé
+            if (!sidebar.classList.contains('active')) {
+                const activeLinks = document.querySelectorAll('.sidebar a.active');
+                activeLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+            }
+        });
     </script>
 </body>
 </html>

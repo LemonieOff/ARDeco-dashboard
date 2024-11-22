@@ -102,9 +102,10 @@
         }
 
         #editButton { background-color: #1BCFC4; }
-        #changeRoleCompany { background-color: #FE9496; }
+        #changeRoleButton { background-color: #FE9496; }
         #changeRolePro { background-color: #9E58FF; }
         #changeActiveStatus { background-color: #526ce3; }
+        #resetAPI { background-color: #fdbc5b; }
 
         .action-button:hover {
             opacity: 0.8;
@@ -215,12 +216,40 @@
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
         }
+
+        #close-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            #close-menu {
+                display: none;
+            }
+
+            .sidebar.active #close-menu {
+                display: block;
+            }
+
+            .sidebar.active #menu-toggle {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
 <button id="menu-toggle"><i class="fas fa-bars"></i></button>
 <div class="container">
     <aside class="sidebar">
+        <button id="close-menu"><i class="fas fa-times"></i></button>
         <h2>ARDeco Administration</h2>
         <nav>
             <ul>
@@ -250,8 +279,9 @@
             </div>
             <div class="button-group">
                 <button id="editButton" class="action-button">Modifier</button>
-                <button id="changeRoleCompany" class="action-button">Changer le rôle en entreprise</button>
+                <button id="changeRoleButton" class="action-button">Changer le rôle en entreprise</button>
                 <button id="changeRolePro" class="action-button">Changer le rôle en professionnel</button>
+                <button id="resetAPI" class="action-button" style="display: none;">Réinitialiser la clé API</button>
                 <button id="changeActiveStatus" class="action-button">Changer le statut</button>
             </div>
             <h3>Historique des commandes :</h3>
@@ -293,6 +323,19 @@
                     document.getElementById('mail').innerText = data.data.email;
                     document.getElementById('phone').innerText = data.data.phone;
                     document.getElementById('address').innerText = data.data.city;
+                    
+                    const roleButton = document.getElementById('changeRoleButton');
+                    const resetAPIButton = document.getElementById('resetAPI');
+                    
+                    if (data.data.role === 'company') {
+                        roleButton.innerText = 'Changer le rôle en client';
+                        roleButton.onclick = () => changeRole('client');
+                        resetAPIButton.style.display = 'block';
+                    } else {
+                        roleButton.innerText = 'Changer le rôle en entreprise';
+                        roleButton.onclick = () => changeRole('company');
+                        resetAPIButton.style.display = 'none';
+                    }
                 } else {
                     alert('Une erreur est survenue lors de la récupération des détails utilisateur');
                 }
@@ -301,7 +344,6 @@
                 alert('Une erreur est survenue lors de la récupération des détails utilisateur: ' + error);
             });
     }
-
 
     getUser();
     getOrderHistory();
@@ -343,20 +385,19 @@
         });
     }
 
-
     document.getElementById('editButton').addEventListener('click', function () {
-        const isEditing = document.getElementById('editButton').innerText === 'Save';
+        const isEditing = document.getElementById('editButton').innerText === 'Sauvegarder';
 
         if (!isEditing) {
             makeFieldsEditable();
-            document.getElementById('editButton').innerText = 'Save';
+            document.getElementById('editButton').innerText = 'Sauvegarder';
         } else {
             saveUserDetails();
-            document.getElementById('editButton').innerText = 'Edit';
+            document.getElementById('editButton').innerText = 'Modifier';
         }
     });
 
-    document.getElementById('changeRoleCompany').addEventListener('click', function () {
+    document.getElementById('changeRoleButton').addEventListener('click', function () {
         changeRole('company');
     });
 
@@ -370,14 +411,32 @@
     });
 
     function setActiveTab() {
-        const currentPath = '/users';
+        const currentPath = window.location.pathname;
+        const sidebar = document.querySelector('.sidebar');
         const links = document.querySelectorAll('.sidebar a');
+        
         links.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
+            if (link.getAttribute('href') === currentPath && (window.innerWidth > 768 || sidebar.classList.contains('active'))) {
                 link.classList.add('active');
+            } else {
+                link.classList.remove('active');
             }
         });
     }
+
+    document.getElementById('close-menu').addEventListener('click', function() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.remove('active');
+        
+        document.getElementById('menu-toggle').style.display = 'block';
+        
+        if (!sidebar.classList.contains('active')) {
+            const activeLinks = document.querySelectorAll('.sidebar a.active');
+            activeLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+        }
+    });        
 
     function changeRole(newRole) {
         fetch(`https://api.ardeco.app/user/${window.location.pathname.split('/').pop()}`, {
@@ -390,20 +449,19 @@
                 role: newRole
             })
         })
-        .then(function(response) {
-            return response.json();
-        }).then(function(data) {
-            console.log(data);
-            if (data.status === 'OK') {
-                alert(`Rôle de l'utilisateur mis à jour en ${newRole}`);
-                document.getElementById('role').innerText = newRole;
-            } else {
-                alert('Une erreur est survenue lors de la mise à jour du rôle');
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        }).catch(error => {
-            console.error(error);
-            alert('An error occurred while updating user role' + error);
-        });
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'OK') {
+                window.location.reload();
+            } else {
+                alert(`Erreur: ${data.description || 'Une erreur est survenue lors de la mise à jour du rôle'}`);
+            }
+        })
     }
 
     function changerStatutActif() {
@@ -456,6 +514,7 @@
         
         if (!firstname || !email) {
             alert('Le prénom et l\'email sont obligatoires');
+            document.getElementById('editButton').innerText = 'Sauvegarder';
             return;
         }
         
@@ -463,7 +522,6 @@
             const inputElement = document.getElementById(`edit-${field}`);
             if (inputElement) {
                 const value = inputElement.value.trim();
-                document.getElementById(field).innerText = value;
                 updatedUserDetails[field] = value;
             }
         });
@@ -485,6 +543,14 @@
         .then(response => response.json())
         .then(data => {
             if (data.status === 'OK') {
+                fields.forEach(field => {
+                    const element = document.getElementById(field);
+                    const inputElement = document.getElementById(`edit-${field}`);
+                    if (inputElement) {
+                        element.innerText = inputElement.value.trim();
+                    }
+                });
+                document.getElementById('editButton').innerText = 'Modifier';
                 alert('Informations utilisateur mises à jour avec succès');
                 getUser();
             } else {
@@ -575,6 +641,27 @@
                 }
             })
         }
+
+    document.getElementById('resetAPI').addEventListener('click', function () {
+        fetch(`https://api.ardeco.app/company/resetToken?id=${window.location.pathname.split('/').pop()}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'OK') {
+                alert('Clé API réinitialisée avec succès');
+            } else {
+                alert('Une erreur est survenue lors de la réinitialisation de la clé API');
+            }
+        }).catch(error => {
+            console.error(error);
+            alert('Une erreur est survenue lors de la réinitialisation de la clé API: ' + error);
+        });
+    });
 </script>
 </body>
 </html>

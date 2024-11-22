@@ -393,7 +393,6 @@
             document.getElementById('editButton').innerText = 'Sauvegarder';
         } else {
             saveUserDetails();
-            document.getElementById('editButton').innerText = 'Modifier';
         }
     });
 
@@ -514,7 +513,6 @@
         
         if (!firstname || !email) {
             alert('Le prénom et l\'email sont obligatoires');
-            document.getElementById('editButton').innerText = 'Sauvegarder';
             return;
         }
         
@@ -554,7 +552,7 @@
                 alert('Informations utilisateur mises à jour avec succès');
                 getUser();
             } else {
-                alert('Une erreur est survenue lors de la mise à jour');
+                alert('Une erreur est survenue lors de la mise à jour : ' + data.description);
             }
         }).catch(error => {
             console.error(error);

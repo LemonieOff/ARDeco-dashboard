@@ -889,10 +889,11 @@ ${!product.archived ? `
                 .then(reponse => reponse.json())
                 .then(donnees => {
                     if (donnees.status === "OK") {
-                        const produit = document.querySelector(`[data-produit-id="${id}"]`);
+                        /*const produit = document.querySelector(`[data-produit-id="${id}"]`);
                         if (produit) {
                             produit.remove();
-                        }
+                        }*/
+                        getCatalog();
                         alert('Produit archivé avec succès');
                     } else {
                         alert("Erreur lors de l'archivage : " + donnees.description);

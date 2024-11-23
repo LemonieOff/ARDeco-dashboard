@@ -469,8 +469,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'OK') {
+                    allGalleries = data.data;
                     galleries = data.data;
-                    displayGalleries(galleries);
+                    applyFilters();
                 } else {
                     console.error('Erreur lors de la récupération des galeries:', data.description);
                 }
@@ -656,19 +657,6 @@
             document.getElementById('galleryModal').style.display = 'none';
         });
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('galleryModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            setActiveTab();
-            getGalleries();
-            getUserRole();
-        });
-
         function checkReports(galleryId, galleryItem) {
             fetch(`https://api.ardeco.app/gallery_report/${galleryId}/reports/list`, {
                 method: 'GET',
@@ -695,7 +683,14 @@
             });
         }
 
-        function displayReports(galleryId, reports) { 
+        function displayReports(galleryId, reports) {
+            if (reports.length === 0) {
+                const modal = document.getElementById('galleryModal');
+                modal.style.display = 'none';
+                getGalleries();
+                return;
+            }
+
             const reportsContainer = document.getElementById('galleryDetails');
             reportsContainer.innerHTML = `
                 <h3>Signalements</h3>
@@ -729,6 +724,7 @@
                     .then(result => {
                         console.log('Signalement supprimé:', result);
                         getGalleryReports(galleryId);
+                        getGalleries();
                     })
                     .catch(error => {
                         console.error('Erreur lors de la suppression du signalement:', error);
@@ -791,7 +787,7 @@
             .then(response => response.json())
             .then(result => {
                 console.log('Visibilité mise à jour:', result);
-                getGalleries(); 
+                getGalleries();
             })
             .catch(error => {
                 console.error('Erreur lors de la mise à jour de la visibilité:', error);
@@ -850,28 +846,6 @@
         let officialValues = {};
         let allGalleries = [];
 
-        function getGalleries() {
-            fetch('https://api.ardeco.app/gallery', {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'OK') {
-                    allGalleries = data.data;
-                    displayGalleries(allGalleries);
-                } else {
-                    console.error('Erreur lors de la récupération des galeries:', data.description);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de la récupération des galeries:', error);
-            });
-        }
-
         function addFilterButton() {
             const container = document.querySelector('.galleries-container h2');
             const filterBtn = document.createElement('button');
@@ -925,25 +899,33 @@
                 .map(tag => tag.textContent);
         }
 
-        function applyFilters() {
+        async function applyFilters() {
+            const res = await fetch('https://api.ardeco.app/gallery_report', {
+                method: 'GET',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            const reported = (await res.json()).data;
+
             const selectedStyles = getSelectedTags('style-filters');
             const selectedRooms = getSelectedTags('room-filters');
             const reportsFilter = document.getElementById('reports-filter').value;
-            
+
             const filteredGalleries = allGalleries.filter(gallery => {
                 const styleMatch = selectedStyles.length === 0 || selectedStyles.includes(gallery.style);
                 const roomMatch = selectedRooms.length === 0 || selectedRooms.includes(gallery.room);
-                
+
                 let reportsMatch = true;
                 if (reportsFilter !== "") {
-                    const galleryItem = document.querySelector(`[data-gallery-id="${gallery.id}"]`);
-                    const hasReports = galleryItem && galleryItem.classList.contains('reported');
+                    const hasReports = reported.includes(gallery.id);
                     reportsMatch = reportsFilter === 'true' ? hasReports : !hasReports;
                 }
-                
+
                 return styleMatch && roomMatch && reportsMatch;
             });
-            
+
             displayGalleries(filteredGalleries);
             document.getElementById('filter-popup').style.display = 'none';
         }
@@ -960,6 +942,11 @@
             const filterPopup = document.getElementById('filter-popup');
             if (event.target === filterPopup) {
                 filterPopup.style.display = 'none';
+            }
+
+            const modal = document.getElementById('galleryModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
             }
         };
 

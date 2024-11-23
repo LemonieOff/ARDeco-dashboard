@@ -1200,12 +1200,6 @@
             document.getElementById('filter-popup').style.display = 'none';
         }
 
-        window.onclick = function(event) {
-            if (event.target.classList.contains('filter-popup')) {
-                event.target.style.display = 'none';
-            }
-        };
-
         function closeModal() {
             const modal = document.getElementById('edit-popup');
             modal.style.display = 'none';
@@ -1257,11 +1251,14 @@
         window.onclick = function(event) {
             const editModal = document.getElementById('edit-popup');
             const addModal = document.getElementById('add-popup');
-            
+            const filterModal = document.getElementById('filter-popup');
+
             if (event.target == editModal) {
                 closeModal();
             } else if (event.target == addModal) {
                 closeAddModal();
+            } else if (event.target == filterModal) {
+                closeFilterPopup();
             }
         }
 

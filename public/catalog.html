@@ -1058,20 +1058,20 @@
                 hasError = true;
             }
 
-            const colors = getSelectedTags('edit-colors').map(color => {
+            const colors = getSelectedTags('edit-colors').map((color) => {
                 const modelIdInput = document.getElementById(`edit-model-id-${color}`);
                 const modelId = parseInt(modelIdInput ? modelIdInput.value : '');
-                
+
                 if (isNaN(modelId) || modelId < 1 || modelId > 100) {
                     showError(`edit-model-id-${color}`, 'L\'ID du modèle doit être un nombre entre 1 et 100');
                     hasError = true;
                     return null;
                 }
-                
-                return { color, model_id: modelId };
-            }).filter(color => color !== null);
 
-            if (colors.length === 0) {
+                return { color, model_id: modelId };
+            });
+
+            if (!colors.length) {
                 showError('edit-colors', 'Au moins une couleur doit être sélectionnée');
                 hasError = true;
             }
@@ -1292,7 +1292,6 @@
 
                 if (isNaN(modelId) || modelId < 1 || modelId > 100) {
                     showError(`add-colors-model-id-${color}`, 'L\'ID du modèle doit être un nombre entre 1 et 100');
-                    console.log(color);
                     hasError = true;
                     return null;
                 }

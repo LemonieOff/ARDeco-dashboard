@@ -356,20 +356,18 @@
         .form-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            /*margin-bottom: 15px;*/
         }
 
         .form-group {
+            position: relative;
+            margin-bottom: 20px;
             flex: 0 0 48%;
         }
 
         .modal-content h2 {
             margin-bottom: 15px;
             color: var(--primary-color);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
         }
 
         .form-group label {
@@ -432,10 +430,6 @@
             background-color: #5a6268;
         }
 
-        .form-group {
-            position: relative;
-        }
-
         .error {
             border-bottom: 2px solid red;
         }
@@ -443,9 +437,7 @@
         .error-message {
             color: red;
             font-size: 12px;
-            position: absolute;
-            bottom: -20px;
-            left: 0;
+            margin-top: 5px;
         }
 
         #logoutButton {
@@ -745,16 +737,21 @@
                     <p>${rooms}</p>
                     <p>${colors}</p>
                     <p>${product.company}: ${product.company_name}</p>
-                    <p>${product.active ? 'Actif' : 'Inactif'}</p>
-${!product.archived ? `
-    <button onclick='openEditProduct(${JSON.stringify(product)})'>Modifier</button>
-    <button style="background-color: #FF4D4D;" onclick="archiverProduit(${product.company}, ${product.id})">Archiver</button>
-    <button style="background-color: #80669d;" onclick="changeVisibility(${product.company}, ${product.id}, ${product.active})">${product.active ? "Masquer" : "Afficher"}</button>
-` : `<div style="grid-column: span 3; display: flex; flex-direction: column; width: 100%; opacity: 0.7;">
-    <button style="background-color: #A9A9A9; margin-bottom: 5px; cursor: not-allowed;" disabled>Archivé</button>
-</div>
-`}
-`;
+                    <p>${product.active ? 'Actif' : 'Inactif'}</p>`;
+                if (!product.archived) {
+                    const formatted = JSON.stringify(product)
+                        .replace(/'/g, "\\'")
+                        .replace(/"/g, '&quot;');
+                    productDiv.innerHTML += `
+                    <button onclick="${'openEditProduct(' + formatted + ')'}">Modifier</button>
+                    <button style="background-color: #FF4D4D;" onclick="archiverProduit(${product.company}, ${product.id})">Archiver</button>
+                    <button style="background-color: #80669d;" onclick="changeVisibility(${product.company}, ${product.id}, ${product.active})">${product.active ? "Masquer" : "Afficher"}</button>`;
+                } else {
+                    productDiv.innerHTML += `
+                    <div style="grid-column: span 3; display: flex; flex-direction: column; width: 100%; opacity: 0.7;">
+                        <button style="background-color: #A9A9A9; margin-bottom: 5px; cursor: not-allowed;" disabled>Archivé</button>
+                    </div>`;
+                }
                 catalog.appendChild(productDiv);
             });
         }
@@ -1285,21 +1282,26 @@ ${!product.archived ? `
             const rooms = getSelectedTags('add-rooms');
             const styles = getSelectedTags('add-styles');
 
+            resetErrors();
+
+            let hasError = false;
+
             const colors = getSelectedTags('add-colors').map((color) => {
-                const modelIdInput = document.getElementById(`model-id-${color}`);
+                const modelIdInput = document.getElementById(`add-colors-model-id-${color}`);
                 const modelId = parseInt(modelIdInput ? modelIdInput.value : '');
-                
+
                 if (isNaN(modelId) || modelId < 1 || modelId > 100) {
-                    showError(`model-id-${color}`, 'L\'ID du modèle doit être un nombre entre 1 et 100');
+                    showError(`add-colors-model-id-${color}`, 'L\'ID du modèle doit être un nombre entre 1 et 100');
+                    console.log(color);
                     hasError = true;
                     return null;
                 }
-                
+
                 return { color, model_id: modelId };
             });
 
             if (colors.includes(null)) {
-                return;
+                // return;
             }
 
             const newProductData = [{}];
@@ -1316,11 +1318,6 @@ ${!product.archived ? `
     
 
             console.log(newProductData);
-
-
-            resetErrors();
-
-            let hasError = false;
 
             if (!companyId) {
                 showError('add-company-id');
@@ -1405,7 +1402,7 @@ ${!product.archived ? `
             field.parentElement.appendChild(errorMessage);
         }
 
-        function resetErrors() {
+        /*function resetErrors() {
             const fields = ['add-name', 'add-price', 'add-height', 'add-width', 'add-depth', 'add-colors', 'add-rooms', 'add-styles'];
             fields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
@@ -1415,7 +1412,7 @@ ${!product.archived ? `
                     errorMessage.remove();
                 }
             });
-        }
+        }*/
 
         function logout() {
             console.log("logout");

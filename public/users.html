@@ -419,6 +419,33 @@
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
         }
+
+        #close-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            #close-menu {
+                display: none;
+            }
+
+            .sidebar.active #close-menu {
+                display: block;
+            }
+
+            .sidebar.active #menu-toggle {
+                display: none;
+            }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -426,6 +453,7 @@
     <button id="menu-toggle"><i class="fas fa-bars"></i></button>
     <div class="container">
         <aside class="sidebar">
+            <button id="close-menu"><i class="fas fa-times"></i></button>
             <h2>ARDeco Administration</h2>
             <nav>
                 <ul>
@@ -510,7 +538,7 @@
                     const companyElement = document.createElement('li');
                     console.log(company);
                     console.log(company.name);
-                    companyElement.innerHTML = `<a href="/company/${company.id}">${company.first_name} ${company.last_name}</a>`;
+                    companyElement.innerHTML = `<a href="/user/${company.id}">${company.first_name} ${company.last_name}</a>`;
                     companyList.appendChild(companyElement);
                 });
             })
@@ -523,13 +551,31 @@
 
     function setActiveTab() {
         const currentPath = window.location.pathname;
+        const sidebar = document.querySelector('.sidebar');
         const links = document.querySelectorAll('.sidebar a');
+        
         links.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
+            if (link.getAttribute('href') === currentPath && (window.innerWidth > 768 || sidebar.classList.contains('active'))) {
                 link.classList.add('active');
+            } else {
+                link.classList.remove('active');
             }
         });
     }
+
+    document.getElementById('close-menu').addEventListener('click', function() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.remove('active');
+        
+        document.getElementById('menu-toggle').style.display = 'block';
+        
+        if (!sidebar.classList.contains('active')) {
+            const activeLinks = document.querySelectorAll('.sidebar a.active');
+            activeLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+        }
+    });
 
     document.getElementById('searchInput').addEventListener('keyup', function() {
         var searchValue = this.value.toLowerCase();

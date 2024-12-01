@@ -257,6 +257,10 @@
             .main-content {
                 margin-top: 50px;
             }
+
+            .sidebar.active #menu-toggle {
+                display: none;
+            }
         }
 
         .sidebar a.active {
@@ -548,62 +552,23 @@
             setActiveTab();
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            getUserRole();
+            setActiveTab();
+        });
+
         function setActiveTab() {
             const currentPath = window.location.pathname;
+            const sidebar = document.querySelector('.sidebar');
             const links = document.querySelectorAll('.sidebar a');
+            
             links.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
+                if (link.getAttribute('href') === currentPath && (window.innerWidth > 768 || sidebar.classList.contains('active'))) {
                     link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
                 }
             });
-        }
-
-        function getUserRole() {
-            if (localStorage.getItem("uid")) {
-                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
-                    method: 'GET',
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'OK') {
-                        if (data.data.role !== 'admin') {
-                            console.log("user is not admin");
-                            //window.location = "/"                        
-                        }
-                        else checkJWT();
-                    }
-                })
-                .catch(error => {
-                    console.log("error:", error);
-                    //window.location = "/";
-                    
-                    console.error(error);
-                });
-            } else {
-               // window.location = "/";
-               console.log("user is not logged in");
-            }
-        }
-
-        function checkJWT() {
-            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
-                method: 'GET',
-                credentials: "include",
-                headers: { 'Content-Type': 'application/json' },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'OK') {
-                    if (data.code !== 200) {
-                        console.log("JWT is invalid");
-                        //window.location = "/";
-                        localStorage.removeItem("jwt");
-                        localStorage.removeItem("uid");
-                    }
-                }
-            })
         }
 
         document.getElementById('close-menu').addEventListener('click', function() {
@@ -619,6 +584,51 @@
                 });
             }
         });
+
+        function getUserRole() {
+            if (localStorage.getItem("uid")) {
+                fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                    method: 'GET',
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        if (data.data.role !== 'admin') {
+                            console.log("user is not admin");
+                        }
+                        else checkJWT();
+                    }
+                })
+                .catch(error => {
+                    console.log("error:", error);
+                    
+                    console.error(error);
+                });
+            } else {
+               console.log("user is not logged in");
+            }
+        }
+
+        function checkJWT() {
+            fetch(`https://api.ardeco.app/user/${localStorage.getItem("uid")}`, {
+                method: 'GET',
+                credentials: "include",
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    if (data.code !== 200) {
+                        console.log("JWT is invalid");
+                        localStorage.removeItem("jwt");
+                        localStorage.removeItem("uid");
+                    }
+                }
+            })
+        }
+
     </script>
 </body>
 </html>

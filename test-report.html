@@ -1,0 +1,260 @@
+<html><head><meta charset="utf-8"/><title>Rapport de Test</title><style type="text/css">html,
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+body {
+  padding: 2rem 1rem;
+  font-size: 0.85rem;
+}
+.jesthtml-content {
+  margin: 0 auto;
+  max-width: 70rem;
+}
+header {
+  display: flex;
+  align-items: center;
+}
+#title {
+  margin: 0;
+  flex-grow: 1;
+}
+#logo {
+  height: 4rem;
+}
+#timestamp {
+  color: #777;
+  margin-top: 0.5rem;
+}
+
+/** SUMMARY */
+#summary {
+  color: #333;
+  margin: 2rem 0;
+  display: flex;
+  font-family: monospace;
+  font-size: 1rem;
+}
+#summary > div {
+  margin-right: 2rem;
+  background: #eee;
+  padding: 1rem;
+  min-width: 15rem;
+}
+#summary > div:last-child {
+  margin-right: 0;
+}
+@media only screen and (max-width: 720px) {
+  #summary {
+    flex-direction: column;
+  }
+  #summary > div {
+    margin-right: 0;
+    margin-top: 2rem;
+  }
+  #summary > div:first-child {
+    margin-top: 0;
+  }
+}
+
+.summary-total {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.summary-passed {
+  color: #4f8a10;
+  border-left: 0.4rem solid #4f8a10;
+  padding-left: 0.5rem;
+}
+.summary-failed,
+.summary-obsolete-snapshots {
+  color: #d8000c;
+  border-left: 0.4rem solid #d8000c;
+  padding-left: 0.5rem;
+}
+.summary-pending {
+  color: #9f6000;
+  border-left: 0.4rem solid #9f6000;
+  padding-left: 0.5rem;
+}
+.summary-empty {
+  color: #999;
+  border-left: 0.4rem solid #999;
+}
+
+.test-result {
+  padding: 1rem;
+  margin-bottom: 0.25rem;
+}
+.test-result:last-child {
+  border: 0;
+}
+.test-result.passed {
+  background-color: #dff2bf;
+  color: #4f8a10;
+}
+.test-result.failed {
+  background-color: #ffbaba;
+  color: #d8000c;
+}
+.test-result.pending {
+  background-color: #ffdf61;
+  color: #9f6000;
+}
+
+.test-info {
+  display: flex;
+  justify-content: space-between;
+}
+.test-suitename {
+  width: 20%;
+  text-align: left;
+  font-weight: bold;
+  word-break: break-word;
+}
+.test-title {
+  width: 40%;
+  text-align: left;
+  font-style: italic;
+}
+.test-status {
+  width: 20%;
+  text-align: right;
+}
+.test-duration {
+  width: 10%;
+  text-align: right;
+  font-size: 0.75rem;
+}
+
+.failureMessages {
+  padding: 0 1rem;
+  margin-top: 1rem;
+  border-top: 1px dashed #d8000c;
+}
+.failureMessages.suiteFailure {
+  border-top: none;
+}
+.failureMsg {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.suite-container {
+  margin-bottom: 2rem;
+}
+.suite-container > input[type="checkbox"] {
+  position: absolute;
+  left: -100vw;
+}
+.suite-container label {
+  display: block;
+}
+.suite-container .suite-tests {
+  overflow-y: hidden;
+  height: 0;
+}
+.suite-container > input[type="checkbox"]:checked ~ .suite-tests {
+  height: auto;
+  overflow: visible;
+}
+.suite-info {
+  padding: 1rem;
+  background-color: #eee;
+  color: #777;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+.suite-info:hover {
+  background-color: #ddd;
+  cursor: pointer;
+}
+.suite-info .suite-path {
+  word-break: break-all;
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 1rem;
+}
+.suite-info .suite-time {
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.3rem;
+  font-size: 0.75rem;
+}
+.suite-info .suite-time.warn {
+  background-color: #d8000c;
+  color: #fff;
+}
+.suite-info:before {
+  content: "\2303";
+  display: inline-block;
+  margin-right: 0.5rem;
+  transform: rotate(0deg);
+}
+.suite-container > input[type="checkbox"]:checked ~ label .suite-info:before {
+  transform: rotate(180deg);
+}
+
+/* CONSOLE LOGS */
+.suite-consolelog {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: #efefef;
+}
+.suite-consolelog-header {
+  font-weight: bold;
+}
+.suite-consolelog-item {
+  padding: 0.5rem;
+}
+.suite-consolelog-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-consolelog-item-origin {
+  color: #777;
+  font-weight: bold;
+}
+.suite-consolelog-item-message {
+  color: #000;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* OBSOLETE SNAPSHOTS */
+.suite-obsolete-snapshots {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: #ffbaba;
+  color: #d8000c;
+}
+.suite-obsolete-snapshots-header {
+  font-weight: bold;
+}
+.suite-obsolete-snapshots-item {
+  padding: 0.5rem;
+}
+.suite-obsolete-snapshots-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-obsolete-snapshots-item-message {
+  color: #000;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+</style></head><body><div class="jesthtml-content"><header><h1 id="title">Rapport de Test</h1></header><div id="metadata-container"><div id="timestamp">Started: 2024-12-05 17:33:39</div><div id="summary"><div id="suite-summary"><div class="summary-total">Suites (9)</div><div class="summary-passed ">8 passed</div><div class="summary-failed ">1 failed</div><div class="summary-pending  summary-empty">0 pending</div></div><div id="test-summary"><div class="summary-total">Tests (35)</div><div class="summary-passed ">30 passed</div><div class="summary-failed ">5 failed</div><div class="summary-pending  summary-empty">0 pending</div></div></div></div><div id="suite-1" class="suite-container"><input id="collapsible-0" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-0"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/users.test.js</div><div class="suite-time warn">5.517s</div></div></label><div class="suite-tests"><div class="test-result failed"><div class="test-info"><div class="test-suitename">Tests de la page des utilisateurs</div><div class="test-title">Vérification de la présence de la liste des utilisateurs</div><div class="test-status">failed</div><div class="test-duration">0.007s</div></div></div><div class="test-result failed"><div class="test-info"><div class="test-suitename">Tests de la page des utilisateurs</div><div class="test-title">Vérification de la présence de la liste des entreprises</div><div class="test-status">failed</div><div class="test-duration">0s</div></div></div><div class="test-result failed"><div class="test-info"><div class="test-suitename">Tests de la page des utilisateurs</div><div class="test-title">Vérification de la présence du bouton de déconnexion</div><div class="test-status">failed</div><div class="test-duration">0s</div></div></div><div class="test-result failed"><div class="test-info"><div class="test-suitename">Tests de la page des utilisateurs</div><div class="test-title">Vérification du clic sur un user et redirection vers le détail</div><div class="test-status">failed</div><div class="test-duration">0s</div></div></div><div class="test-result failed"><div class="test-info"><div class="test-suitename">Tests de la page des utilisateurs</div><div class="test-title">Vérification du bouton de déconnexion</div><div class="test-status">failed</div><div class="test-duration">0s</div></div></div></div></div><div id="suite-2" class="suite-container"><input id="collapsible-1" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-1"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/dashboard.test.js</div><div class="suite-time warn">14.236s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests du tableau de bord</div><div class="test-title">Vérification de la présence de la sidebar</div><div class="test-status">passed</div><div class="test-duration">1.601s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests du tableau de bord</div><div class="test-title">Vérification de la présence du contenu principal</div><div class="test-status">passed</div><div class="test-duration">2.042s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests du tableau de bord</div><div class="test-title">Vérification de la présence du graphique de priorité</div><div class="test-status">passed</div><div class="test-duration">0.698s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests du tableau de bord</div><div class="test-title">Vérification de la présence du graphique de la semaine</div><div class="test-status">passed</div><div class="test-duration">0.856s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests du tableau de bord</div><div class="test-title">Vérification de la présence de la liste des tickets ouverts</div><div class="test-status">passed</div><div class="test-duration">0.971s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests du tableau de bord</div><div class="test-title">Vérification de la présence du bouton de déconnexion</div><div class="test-status">passed</div><div class="test-duration">0.6s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests du tableau de bord</div><div class="test-title">Vérification du bouton de déconnexion</div><div class="test-status">passed</div><div class="test-duration">1.557s</div></div></div></div></div><div id="suite-3" class="suite-container"><input id="collapsible-2" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-2"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/suggestions.test.js</div><div class="suite-time warn">17.338s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des suggestions</div><div class="test-title">Vérification des éléments principaux de la page des suggestions</div><div class="test-status">passed</div><div class="test-duration">7.486s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des suggestions</div><div class="test-title">Vérification de l'affichage des détails d'une suggestion</div><div class="test-status">passed</div><div class="test-duration">4.035s</div></div></div></div></div><div id="suite-4" class="suite-container"><input id="collapsible-3" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-3"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/archives.test.js</div><div class="suite-time warn">12.781s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des archives</div><div class="test-title">Vérification de la présence de la liste des companies et leur archives</div><div class="test-status">passed</div><div class="test-duration">4.744s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des archives</div><div class="test-title">Vérification de la déconnexion</div><div class="test-status">passed</div><div class="test-duration">3.596s</div></div></div></div></div><div id="suite-5" class="suite-container"><input id="collapsible-4" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-4"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/auth.test.js</div><div class="suite-time warn">6.384s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests d'authentification</div><div class="test-title">Tentative de connexion avec des identifiants valides</div><div class="test-status">passed</div><div class="test-duration">2.379s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests d'authentification</div><div class="test-title">Tentative de connexion avec des identifiants invalides</div><div class="test-status">passed</div><div class="test-duration">0.298s</div></div></div></div></div><div id="suite-6" class="suite-container"><input id="collapsible-5" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-5"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/ticketChat.test.js</div><div class="suite-time warn">23.658s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page ticket chat</div><div class="test-title">Vérification du clic sur un ticket et redirection vers le chat</div><div class="test-status">passed</div><div class="test-duration">7.364s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page ticket chat</div><div class="test-title">Vérification des éléments de la page de chat</div><div class="test-status">passed</div><div class="test-duration">4.044s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page ticket chat</div><div class="test-title">Vérification de l'envoi d'un message</div><div class="test-status">passed</div><div class="test-duration">6.49s</div></div></div></div></div><div id="suite-7" class="suite-container"><input id="collapsible-6" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-6"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/changelog.test.js</div><div class="suite-time warn">23.992s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du changelog</div><div class="test-title">Vérification des éléments principaux de la page du changelog</div><div class="test-status">passed</div><div class="test-duration">7.184s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du changelog</div><div class="test-title">Vérification de la création d'une nouvelle version</div><div class="test-status">passed</div><div class="test-duration">7.188s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du changelog</div><div class="test-title">Vérification de l'expansion des versions</div><div class="test-status">passed</div><div class="test-duration">3.872s</div></div></div></div></div><div id="suite-8" class="suite-container"><input id="collapsible-7" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-7"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/galleries.test.js</div><div class="suite-time warn">30.214s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des galeries</div><div class="test-title">Vérification des éléments principaux de la page</div><div class="test-status">passed</div><div class="test-duration">7.624s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des galeries</div><div class="test-title">Vérification du fonctionnement des filtres</div><div class="test-status">passed</div><div class="test-duration">3.923s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des galeries</div><div class="test-title">Vérification de l'expansion des galeries</div><div class="test-status">passed</div><div class="test-duration">4.701s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des galeries</div><div class="test-title">Vérification des détails d'une galerie</div><div class="test-status">passed</div><div class="test-duration">4.365s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page des galeries</div><div class="test-title">Vérification du changement de visibilité</div><div class="test-status">passed</div><div class="test-duration">3.724s</div></div></div></div></div><div id="suite-9" class="suite-container"><input id="collapsible-8" type="checkbox" class="toggle" checked="checked"/><label for="collapsible-8"><div class="suite-info"><div class="suite-path">/Users/louis/Documents/EIP/newDash/ARDeco-dashboard/tests/__tests__/catalog.test.js</div><div class="suite-time warn">35.672s</div></div></label><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du catalogue</div><div class="test-title">Vérification des éléments principaux de la page du catalogue</div><div class="test-status">passed</div><div class="test-duration">6.271s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du catalogue</div><div class="test-title">Vérification du fonctionnement des filtres</div><div class="test-status">passed</div><div class="test-duration">5.164s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du catalogue</div><div class="test-title">Vérification de l'ajout d'un nouveau produit</div><div class="test-status">passed</div><div class="test-duration">7.504s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du catalogue</div><div class="test-title">Vérification du changement de visibilité d'un produit</div><div class="test-status">passed</div><div class="test-duration">3.903s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du catalogue</div><div class="test-title">Vérification de l'archivage d'un produit</div><div class="test-status">passed</div><div class="test-duration">4.064s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Tests de la page du catalogue</div><div class="test-title">Vérification du mode sombre</div><div class="test-status">passed</div><div class="test-duration">3.107s</div></div></div></div></div></div></body></html>
